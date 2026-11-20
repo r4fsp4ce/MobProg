@@ -83,7 +83,6 @@ class SQLiteTodoStoreTest {
     @Test
     fun databaseCreatesInbox() {
         val inbox = store.folder(store.inboxId())
-
         assertNotNull(inbox)
         assertEquals("Inbox", inbox?.name)
     }
@@ -93,11 +92,8 @@ class SQLiteTodoStoreTest {
     @Test
     fun createFolderWorks() {
         val result = store.createFolder("School")
-
         assertTrue(result is FolderNameResult.Created)
-        assertTrue(
-            store.folders().any { it.name == "School" }
-        )
+        assertTrue(store.folders().any { it.name == "School" })
     }
 
     // TEST 3: DUPLICATE FOLDER VALIDATION
@@ -105,13 +101,8 @@ class SQLiteTodoStoreTest {
     @Test
     fun duplicateFolderIsRejected() {
         store.createFolder("School")
-
         val result = store.createFolder("school")
-
-        assertEquals(
-            FolderNameResult.Duplicate,
-            result
-        )
+        assertEquals(FolderNameResult.Duplicate, result)
     }
 
     // TEST 4: RENAME FOLDER
@@ -148,10 +139,7 @@ class SQLiteTodoStoreTest {
 
     @Test
     fun createAndReadNoteWorks() {
-        val id = store.saveNote(
-            sampleNote("Backend Test")
-        )
-
+        val id = store.saveNote(sampleNote("Backend Test"))
         val saved = store.note(id)
 
         assertNotNull(saved)
@@ -166,10 +154,7 @@ class SQLiteTodoStoreTest {
 
     @Test
     fun updateNoteWorks() {
-        val id = store.saveNote(
-            sampleNote("Original Title")
-        )
-
+        val id = store.saveNote(sampleNote("Original Title"))
         val existing = store.note(id)!!
 
         store.saveNote(
@@ -190,22 +175,13 @@ class SQLiteTodoStoreTest {
 
     @Test
     fun checklistUpdateWorks() {
-        val id = store.saveNote(
-            sampleNote("Checklist Test")
-        )
-
-        val entryId = store.note(id)!!
-            .allEntries()
-            .first()
-            .id
+        val id = store.saveNote(sampleNote("Checklist Test"))
+        val entryId = store.note(id)!!.allEntries().first().id
 
         store.markChecked(entryId, true)
 
         assertTrue(
-            store.note(id)!!
-                .allEntries()
-                .first()
-                .checked
+            store.note(id)!!.allEntries().first().checked
         )
     }
 
@@ -213,9 +189,7 @@ class SQLiteTodoStoreTest {
 
     @Test
     fun trashAndRestoreWorks() {
-        val id = store.saveNote(
-            sampleNote("Trash Test")
-        )
+        val id = store.saveNote(sampleNote("Trash Test"))
 
         store.trashNote(id)
         assertTrue(store.note(id)!!.note.trashed)
@@ -228,12 +202,8 @@ class SQLiteTodoStoreTest {
 
     @Test
     fun deleteForeverWorks() {
-        val id = store.saveNote(
-            sampleNote("Delete Test")
-        )
-
+        val id = store.saveNote(sampleNote("Delete Test"))
         store.deleteForever(id)
-
         assertNull(store.note(id))
     }
 
@@ -241,10 +211,7 @@ class SQLiteTodoStoreTest {
 
     @Test
     fun notePersistsAcrossStoreInstances() {
-        val id = store.saveNote(
-            sampleNote("Persistent Note")
-        )
-
+        val id = store.saveNote(sampleNote("Persistent Note"))
         val reopenedStore = SQLiteTodoStore(context)
 
         assertEquals(
@@ -307,18 +274,10 @@ class SQLiteTodoStoreTest {
 
     @Test
     fun mergeNotesWorks() {
-        val sourceId = store.saveNote(
-            sampleNote("Source Note")
-        )
+        val sourceId = store.saveNote(sampleNote("Source Note"))
+        val targetId = store.saveNote(sampleNote("Target Note"))
 
-        val targetId = store.saveNote(
-            sampleNote("Target Note")
-        )
-
-        val token = store.appendNotes(
-            sourceId,
-            targetId
-        )
+        val token = store.appendNotes(sourceId, targetId)
 
         assertNotNull(token)
         assertNull(store.note(sourceId))
@@ -339,18 +298,10 @@ class SQLiteTodoStoreTest {
 
     @Test
     fun undoMergeWorks() {
-        val sourceId = store.saveNote(
-            sampleNote("Source Note")
-        )
+        val sourceId = store.saveNote(sampleNote("Source Note"))
+        val targetId = store.saveNote(sampleNote("Target Note"))
 
-        val targetId = store.saveNote(
-            sampleNote("Target Note")
-        )
-
-        val token = store.appendNotes(
-            sourceId,
-            targetId
-        )
+        val token = store.appendNotes(sourceId, targetId)
 
         assertNotNull(token)
         assertTrue(store.undoAppend(token!!))
@@ -395,11 +346,9 @@ class SQLiteTodoStoreTest {
 
     @Test
     fun markdownExportWorks() {
-        val id = store.saveNote(
-            sampleNote("Markdown Export Test")
-        )
-
+        val id = store.saveNote(sampleNote("Markdown Export Test"))
         val base = context.getExternalFilesDir("notes")
+
         assertNotNull(base)
 
         val markdownFile = File(
@@ -414,12 +363,8 @@ class SQLiteTodoStoreTest {
 
         val content = markdownFile.readText()
 
-        assertTrue(
-            content.contains("# Markdown Export Test")
-        )
-        assertTrue(
-            content.contains("Finish assignment")
-        )
+        assertTrue(content.contains("# Markdown Export Test"))
+        assertTrue(content.contains("Finish assignment"))
     }
 
     // TEST 19: DEADLINE PERSISTENCE
@@ -427,7 +372,6 @@ class SQLiteTodoStoreTest {
     @Test
     fun deadlinePersistsInDatabase() {
         val deadline = System.currentTimeMillis() + 86400000L
-
         val original = sampleNote("Deadline Test")
 
         val updatedBlock = original.blocks.first().copy(
@@ -443,13 +387,9 @@ class SQLiteTodoStoreTest {
         val reopenedStore = SQLiteTodoStore(context)
 
         val savedEntry = reopenedStore.note(id)!!
-            .allEntries()
-            .first()
+            .allEntries().first()
 
-        assertEquals(
-            deadline,
-            savedEntry.deadlineAt
-        )
+        assertEquals(deadline, savedEntry.deadlineAt)
     }
 
     // TEST 20: REMINDERS QUERY
@@ -457,7 +397,6 @@ class SQLiteTodoStoreTest {
     @Test
     fun remindersReturnsSavedDeadline() {
         val deadline = System.currentTimeMillis() + 86400000L
-
         val original = sampleNote("Reminder Test")
 
         val updatedBlock = original.blocks.first().copy(
@@ -474,10 +413,7 @@ class SQLiteTodoStoreTest {
 
         assertEquals(1, reminders.size)
         assertEquals(id, reminders.first().noteId)
-        assertEquals(
-            deadline,
-            reminders.first().deadlineAt
-        )
+        assertEquals(deadline, reminders.first().deadlineAt)
     }
 
     // TEST 21: CHECKLIST REMINDER STATUS
@@ -485,7 +421,6 @@ class SQLiteTodoStoreTest {
     @Test
     fun reminderReflectsCheckedStatus() {
         val deadline = System.currentTimeMillis() + 86400000L
-
         val original = sampleNote("Checklist Reminder")
 
         val updatedBlock = original.blocks.first().copy(
@@ -498,10 +433,7 @@ class SQLiteTodoStoreTest {
             original.copy(blocks = listOf(updatedBlock))
         )
 
-        val entryId = store.note(id)!!
-            .allEntries()
-            .first()
-            .id
+        val entryId = store.note(id)!!.allEntries().first().id
 
         store.markChecked(entryId, true)
 
@@ -509,5 +441,34 @@ class SQLiteTodoStoreTest {
             .first { it.entryId == entryId }
 
         assertTrue(reminder.checked)
+    }
+
+    // TEST 22: ENTRY ID PRESERVATION AFTER NOTE UPDATE
+
+    @Test
+    fun entryIdRemainsSameAfterNoteUpdate() {
+        val id = store.saveNote(
+            sampleNote("Original Note")
+        )
+
+        val original = store.note(id)!!
+        val originalEntryId = original.allEntries().first().id
+
+        store.saveNote(
+            original.copy(
+                note = original.note.copy(
+                    title = "Updated Note"
+                )
+            )
+        )
+
+        val updated = store.note(id)!!
+        val updatedEntryId = updated.allEntries().first().id
+
+        assertEquals(
+            "Entry ID must remain unchanged after update",
+            originalEntryId,
+            updatedEntryId
+        )
     }
 }
