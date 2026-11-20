@@ -37,6 +37,47 @@ class SQLiteTodoStoreTest {
         )
     }
 
+    // HELPER: CREATE SAMPLE NOTE
+
+    private fun sampleNote(title: String): NoteDetail {
+        val note = Note(
+            id = -1L,
+            folderId = store.inboxId(),
+            title = title,
+            color = NoteColor.YELLOW,
+            pinned = false,
+            archived = false,
+            trashed = false,
+            createdAt = 0L,
+            updatedAt = 0L
+        )
+
+        val block = Block(
+            id = 0L,
+            noteId = -1L,
+            position = 0,
+            heading = "",
+            originNoteId = null
+        )
+
+        val entry = Entry(
+            id = 0L,
+            blockId = 0L,
+            position = 0,
+            type = EntryType.CHECKBOX,
+            text = "Finish assignment",
+            checked = false,
+            priority = Priority.HIGHEST,
+            deadlineAt = null,
+            allDay = false
+        )
+
+        return NoteDetail(
+            note,
+            listOf(BlockDetail(block, listOf(entry)))
+        )
+    }
+
     // TEST 1: DATABASE INITIALIZATION
 
     @Test
@@ -101,47 +142,6 @@ class SQLiteTodoStoreTest {
 
         assertTrue(store.deleteFolder(created.folder.id))
         assertNull(store.folder(created.folder.id))
-    }
-
-    // HELPER: CREATE SAMPLE NOTE
-
-    private fun sampleNote(title: String): NoteDetail {
-        val note = Note(
-            id = -1L,
-            folderId = store.inboxId(),
-            title = title,
-            color = NoteColor.YELLOW,
-            pinned = false,
-            archived = false,
-            trashed = false,
-            createdAt = 0L,
-            updatedAt = 0L
-        )
-
-        val block = Block(
-            id = 0L,
-            noteId = -1L,
-            position = 0,
-            heading = "",
-            originNoteId = null
-        )
-
-        val entry = Entry(
-            id = 0L,
-            blockId = 0L,
-            position = 0,
-            type = EntryType.CHECKBOX,
-            text = "Finish assignment",
-            checked = false,
-            priority = Priority.HIGHEST,
-            deadlineAt = null,
-            allDay = false
-        )
-
-        return NoteDetail(
-            note,
-            listOf(BlockDetail(block, listOf(entry)))
-        )
     }
 
     // TEST 6: CREATE AND READ NOTE
@@ -417,9 +417,97 @@ class SQLiteTodoStoreTest {
         assertTrue(
             content.contains("# Markdown Export Test")
         )
-
         assertTrue(
             content.contains("Finish assignment")
         )
+    }
+
+    // TEST 19: DEADLINE PERSISTENCE
+
+    @Test
+    fun deadlinePersistsInDatabase() {
+        val deadline = System.currentTimeMillis() + 86400000L
+
+        val original = sampleNote("Deadline Test")
+
+        val updatedBlock = original.blocks.first().copy(
+            entries = original.blocks.first().entries.map {
+                it.copy(deadlineAt = deadline)
+            }
+        )
+
+        val id = store.saveNote(
+            original.copy(blocks = listOf(updatedBlock))
+        )
+
+        val reopenedStore = SQLiteTodoStore(context)
+
+        val savedEntry = reopenedStore.note(id)!!
+            .allEntries()
+            .first()
+
+        assertEquals(
+            deadline,
+            savedEntry.deadlineAt
+        )
+    }
+
+    // TEST 20: REMINDERS QUERY
+
+    @Test
+    fun remindersReturnsSavedDeadline() {
+        val deadline = System.currentTimeMillis() + 86400000L
+
+        val original = sampleNote("Reminder Test")
+
+        val updatedBlock = original.blocks.first().copy(
+            entries = original.blocks.first().entries.map {
+                it.copy(deadlineAt = deadline)
+            }
+        )
+
+        val id = store.saveNote(
+            original.copy(blocks = listOf(updatedBlock))
+        )
+
+        val reminders = store.reminders()
+
+        assertEquals(1, reminders.size)
+        assertEquals(id, reminders.first().noteId)
+        assertEquals(
+            deadline,
+            reminders.first().deadlineAt
+        )
+    }
+
+    // TEST 21: CHECKLIST REMINDER STATUS
+
+    @Test
+    fun reminderReflectsCheckedStatus() {
+        val deadline = System.currentTimeMillis() + 86400000L
+
+        val original = sampleNote("Checklist Reminder")
+
+        val updatedBlock = original.blocks.first().copy(
+            entries = original.blocks.first().entries.map {
+                it.copy(deadlineAt = deadline)
+            }
+        )
+
+        val id = store.saveNote(
+            original.copy(blocks = listOf(updatedBlock))
+        )
+
+        val entryId = store.note(id)!!
+            .allEntries()
+            .first()
+            .id
+
+        store.markChecked(entryId, true)
+
+        val reminder = store.reminders()
+            .first { it.entryId == entryId }
+
+        assertTrue(reminder.checked)
     }
 }
