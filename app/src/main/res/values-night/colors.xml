@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Material 3 palette, dark. -->
+    <color name="color_primary">#B9C3FF</color>
+    <color name="color_on_primary">#1B2A78</color>
+    <color name="color_primary_container">#324195</color>
+    <color name="color_on_primary_container">#E0E0FF</color>
+    <color name="color_secondary">#C5C4DD</color>
+    <color name="color_on_secondary">#2E2F42</color>
+    <color name="color_secondary_container">#444559</color>
+    <color name="color_on_secondary_container">#E1E0F9</color>
+    <color name="color_tertiary">#E7B9D5</color>
+    <color name="color_surface">#131318</color>
+    <color name="color_on_surface">#E5E1E9</color>
+    <color name="color_surface_variant">#47464F</color>
+    <color name="color_on_surface_variant">#C8C5D0</color>
+    <color name="color_outline">#918F9A</color>
+    <color name="color_outline_variant">#47464F</color>
+    <color name="color_error">#FFB4AB</color>
+    <color name="color_on_error">#690005</color>
+    <color name="color_surface_container">#1F1F25</color>
+    <color name="color_surface_container_high">#292930</color>
+    <color name="color_surface_container_highest">#34343B</color>
+    <color name="color_window_background">#0F0F14</color>
+
+    <color name="icon_tint">#C8C5D0</color>
+
+    <color name="note_default">#1E1E24</color>
+    <color name="note_red">#4A2F2E</color>
+    <color name="note_orange">#4A3A28</color>
+    <color name="note_yellow">#463F26</color>
+    <color name="note_green">#2F3E2C</color>
+    <color name="note_teal">#28403E</color>
+    <color name="note_blue">#2B3A4D</color>
+    <color name="note_indigo">#2E3355</color>
+    <color name="note_purple">#3A2F4D</color>
+    <color name="note_pink">#452C3A</color>
+    <color name="note_brown">#3E332C</color>
+    <color name="note_gray">#303036</color>
+
+    <color name="deadline_normal">#C8C5D0</color>
+    <color name="deadline_soon">#FFB95C</color>
+    <color name="deadline_overdue">#FFB4AB</color>
+
+    <color name="ripple">#33FFFFFF</color>
+    <color name="pill_background">#26FFFFFF</color>
+</resources>

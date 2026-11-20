@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Spacing -->
+    <dimen name="space_xxs">2dp</dimen>
+    <dimen name="space_xs">4dp</dimen>
+    <dimen name="space_s">8dp</dimen>
+    <dimen name="space_m">12dp</dimen>
+    <dimen name="space_l">16dp</dimen>
+    <dimen name="space_xl">24dp</dimen>
+    <dimen name="space_xxl">32dp</dimen>
+
+    <!-- Touch targets: never below 48dp. -->
+    <dimen name="touch_target">48dp</dimen>
+    <dimen name="icon_s">20dp</dimen>
+    <dimen name="icon_m">24dp</dimen>
+
+    <!-- Cards -->
+    <dimen name="card_corner">16dp</dimen>
+    <dimen name="card_elevation">1dp</dimen>
+    <dimen name="card_elevation_drag">8dp</dimen>
+    <dimen name="card_padding">@dimen/space_m</dimen>
+    <dimen name="grid_gap">@dimen/space_s</dimen>
+
+    <!-- Chips and badges -->
+    <dimen name="chip_corner">10dp</dimen>
+    <dimen name="chip_padding_h">8dp</dimen>
+    <dimen name="chip_padding_v">2dp</dimen>
+    <dimen name="badge_dot">14dp</dimen>
+
+    <!-- Editor -->
+    <dimen name="editor_max_width">720dp</dimen>
+    <dimen name="block_corner">12dp</dimen>
+    <dimen name="ribbon_height">56dp</dimen>
+    <dimen name="divider">1dp</dimen>
+
+    <!-- Empty state -->
+    <dimen name="empty_illustration">120dp</dimen>
+</resources>

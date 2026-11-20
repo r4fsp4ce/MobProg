@@ -10,12 +10,17 @@ android {
 
     defaultConfig {
         applicationId = "com.example.mobprog"
-        minSdk = 37
+        // ARCHITECTURE.md: minSdk 26
+        minSdk = 26
         targetSdk = 37
         versionCode = 1
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+    }
+
+    buildFeatures {
+        viewBinding = true
     }
 
     buildTypes {
@@ -35,7 +40,10 @@ dependencies {
     implementation(libs.activity.ktx)
     implementation(libs.appcompat)
     implementation(libs.constraintlayout)
+    implementation(libs.core.ktx)
     implementation(libs.material)
+    implementation(libs.recyclerview)
+    implementation(libs.markwon.core)
     testImplementation(libs.junit)
     androidTestImplementation(libs.espresso.core)
     androidTestImplementation(libs.ext.junit)
