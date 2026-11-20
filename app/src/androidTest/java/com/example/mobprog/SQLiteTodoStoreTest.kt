@@ -443,13 +443,11 @@ class SQLiteTodoStoreTest {
         assertTrue(reminder.checked)
     }
 
-    // TEST 22: ENTRY ID PRESERVATION AFTER NOTE UPDATE
+    // TEST 22: ENTRY ID PRESERVATION AFTER UPDATE
 
     @Test
     fun entryIdRemainsSameAfterNoteUpdate() {
-        val id = store.saveNote(
-            sampleNote("Original Note")
-        )
+        val id = store.saveNote(sampleNote("Original Note"))
 
         val original = store.note(id)!!
         val originalEntryId = original.allEntries().first().id
@@ -470,5 +468,95 @@ class SQLiteTodoStoreTest {
             originalEntryId,
             updatedEntryId
         )
+    }
+
+    // TEST 23: PRESERVE ENTRY IDS AFTER MERGE
+
+    @Test
+    fun mergePreservesEntryIds() {
+        val sourceId = store.saveNote(sampleNote("Source"))
+        val targetId = store.saveNote(sampleNote("Target"))
+
+        val sourceEntryId =
+            store.note(sourceId)!!.allEntries().first().id
+
+        val targetEntryId =
+            store.note(targetId)!!.allEntries().first().id
+
+        val token = store.appendNotes(sourceId, targetId)
+
+        assertNotNull(token)
+
+        val mergedEntryIds = store.note(targetId)!!
+            .allEntries().map { it.id }
+
+        assertTrue(mergedEntryIds.contains(sourceEntryId))
+        assertTrue(mergedEntryIds.contains(targetEntryId))
+    }
+
+    // TEST 24: PRESERVE DEADLINES AFTER MERGE
+
+    @Test
+    fun mergePreservesDeadlines() {
+        val deadline = System.currentTimeMillis() + 86400000L
+
+        val source = sampleNote("Source")
+        val sourceWithDeadline = source.copy(
+            blocks = source.blocks.map { block ->
+                block.copy(
+                    entries = block.entries.map {
+                        it.copy(deadlineAt = deadline)
+                    }
+                )
+            }
+        )
+
+        val sourceId = store.saveNote(sourceWithDeadline)
+        val targetId = store.saveNote(sampleNote("Target"))
+
+        assertNotNull(store.appendNotes(sourceId, targetId))
+
+        val merged = store.note(targetId)!!
+
+        assertTrue(
+            merged.allEntries().any {
+                it.deadlineAt == deadline
+            }
+        )
+    }
+
+    // TEST 25: UNDO RESTORES IDS AND DEADLINES
+
+    @Test
+    fun undoMergeRestoresEntryIdsAndDeadlines() {
+        val deadline = System.currentTimeMillis() + 86400000L
+
+        val source = sampleNote("Source")
+        val sourceWithDeadline = source.copy(
+            blocks = source.blocks.map { block ->
+                block.copy(
+                    entries = block.entries.map {
+                        it.copy(deadlineAt = deadline)
+                    }
+                )
+            }
+        )
+
+        val sourceId = store.saveNote(sourceWithDeadline)
+        val targetId = store.saveNote(sampleNote("Target"))
+
+        val originalEntryId =
+            store.note(sourceId)!!.allEntries().first().id
+
+        val token = store.appendNotes(sourceId, targetId)
+
+        assertNotNull(token)
+        assertTrue(store.undoAppend(token!!))
+
+        val restored = store.note(sourceId)!!
+        val restoredEntry = restored.allEntries().first()
+
+        assertEquals(originalEntryId, restoredEntry.id)
+        assertEquals(deadline, restoredEntry.deadlineAt)
     }
 }
