@@ -1,14 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:background="@drawable/bg_ribbon"
     android:gravity="center_vertical"
     android:orientation="horizontal"
-    android:paddingStart="@dimen/space_xs"
-    android:paddingTop="@dimen/space_xs"
-    android:paddingEnd="@dimen/space_xs"
-    android:paddingBottom="@dimen/space_xs">
+    android:paddingStart="@dimen/space_xxs"
+    android:paddingTop="@dimen/space_xxs"
+    android:paddingEnd="@dimen/space_xxs"
+    android:paddingBottom="@dimen/space_xxs">
 
     <HorizontalScrollView
         android:layout_width="0dp"
@@ -26,7 +27,7 @@
                 android:id="@+id/ribbon_list_type"
                 style="@style/Widget.Tudow.RibbonButton"
                 android:background="?attr/selectableItemBackgroundBorderless"
-                android:src="@drawable/ic_list" />
+                android:src="@drawable/ic_checklist" />
 
             <ImageButton
                 android:id="@+id/ribbon_clock"
@@ -48,28 +49,37 @@
                 android:background="?attr/selectableItemBackgroundBorderless"
                 android:contentDescription="@string/cd_color"
                 android:src="@drawable/ic_palette" />
+
+            <!-- Undo/redo live in the scroll group so a narrow overlay still fits them. -->
+            <ImageButton
+                android:id="@+id/ribbon_undo"
+                style="@style/Widget.Tudow.RibbonButton"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:contentDescription="@string/cd_undo"
+                android:src="@drawable/ic_undo" />
+
+            <ImageButton
+                android:id="@+id/ribbon_redo"
+                style="@style/Widget.Tudow.RibbonButton"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:contentDescription="@string/cd_redo"
+                android:src="@drawable/ic_redo" />
+
+            <ImageButton
+                android:id="@+id/ribbon_raw_markdown"
+                style="@style/Widget.Tudow.RibbonButton"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:contentDescription="@string/cd_raw_markdown"
+                android:src="@drawable/ic_raw_markdown"
+                android:visibility="gone" />
         </LinearLayout>
     </HorizontalScrollView>
 
     <View
         android:layout_width="@dimen/divider"
-        android:layout_height="24dp"
+        android:layout_height="18dp"
         android:layout_marginHorizontal="@dimen/space_xxs"
-        android:background="?attr/colorOutlineVariant" />
-
-    <ImageButton
-        android:id="@+id/ribbon_undo"
-        style="@style/Widget.Tudow.RibbonButton"
-        android:background="?attr/selectableItemBackgroundBorderless"
-        android:contentDescription="@string/cd_undo"
-        android:src="@drawable/ic_undo" />
-
-    <ImageButton
-        android:id="@+id/ribbon_redo"
-        style="@style/Widget.Tudow.RibbonButton"
-        android:background="?attr/selectableItemBackgroundBorderless"
-        android:contentDescription="@string/cd_redo"
-        android:src="@drawable/ic_redo" />
+        android:background="@color/color_hairline_strong" />
 
     <ImageButton
         android:id="@+id/ribbon_discard"
@@ -81,7 +91,10 @@
     <ImageButton
         android:id="@+id/ribbon_save"
         style="@style/Widget.Tudow.RibbonButton"
-        android:background="?attr/selectableItemBackgroundBorderless"
+        android:layout_marginStart="@dimen/space_xxs"
+        android:background="@drawable/bg_round_accent"
         android:contentDescription="@string/cd_save"
-        android:src="@drawable/ic_check" />
+        android:padding="10dp"
+        android:src="@drawable/ic_check"
+        app:tint="@color/color_on_accent" />
 </LinearLayout>

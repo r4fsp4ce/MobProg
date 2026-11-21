@@ -1,47 +1,52 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!-- Material 3 palette, dark. -->
-    <color name="color_primary">#B9C3FF</color>
-    <color name="color_on_primary">#1B2A78</color>
-    <color name="color_primary_container">#324195</color>
-    <color name="color_on_primary_container">#E0E0FF</color>
-    <color name="color_secondary">#C5C4DD</color>
-    <color name="color_on_secondary">#2E2F42</color>
-    <color name="color_secondary_container">#444559</color>
-    <color name="color_on_secondary_container">#E1E0F9</color>
-    <color name="color_tertiary">#E7B9D5</color>
-    <color name="color_surface">#131318</color>
-    <color name="color_on_surface">#E5E1E9</color>
-    <color name="color_surface_variant">#47464F</color>
-    <color name="color_on_surface_variant">#C8C5D0</color>
-    <color name="color_outline">#918F9A</color>
-    <color name="color_outline_variant">#47464F</color>
+    <!-- Dark mode: deep ink background, mint text, the same green accent. -->
+    <color name="color_primary">#19B866</color>
+    <color name="color_on_primary">#061211</color>
+    <color name="color_primary_container">#0E3B24</color>
+    <color name="color_on_primary_container">#A9F2CB</color>
+    <color name="color_accent">#19B866</color>
+    <color name="color_on_accent">#061211</color>
+    <color name="color_secondary">#9DB8B3</color>
+    <color name="color_on_secondary">#102420</color>
+    <color name="color_secondary_container">#1B322D</color>
+    <color name="color_on_secondary_container">#D7E7E4</color>
+    <color name="color_tertiary">#7FE0AE</color>
+    <color name="color_surface">#0B1A18</color>
+    <color name="color_on_surface">#CEE0DF</color>
+    <color name="color_surface_variant">#10211F</color>
+    <color name="color_on_surface_variant">#9DB8B3</color>
+    <color name="color_outline">#3F5A55</color>
+    <color name="color_outline_variant">#243B37</color>
     <color name="color_error">#FFB4AB</color>
     <color name="color_on_error">#690005</color>
-    <color name="color_surface_container">#1F1F25</color>
-    <color name="color_surface_container_high">#292930</color>
-    <color name="color_surface_container_highest">#34343B</color>
-    <color name="color_window_background">#0F0F14</color>
+    <color name="color_surface_container">#0B1A18</color>
+    <color name="color_surface_container_high">#10211F</color>
+    <color name="color_surface_container_highest">#152824</color>
+    <color name="color_window_background">#061211</color>
 
-    <color name="icon_tint">#C8C5D0</color>
+    <color name="color_hairline">#1ACEE0DF</color>
+    <color name="color_hairline_strong">#26CEE0DF</color>
 
-    <color name="note_default">#1E1E24</color>
-    <color name="note_red">#4A2F2E</color>
-    <color name="note_orange">#4A3A28</color>
-    <color name="note_yellow">#463F26</color>
-    <color name="note_green">#2F3E2C</color>
-    <color name="note_teal">#28403E</color>
-    <color name="note_blue">#2B3A4D</color>
-    <color name="note_indigo">#2E3355</color>
-    <color name="note_purple">#3A2F4D</color>
-    <color name="note_pink">#452C3A</color>
-    <color name="note_brown">#3E332C</color>
-    <color name="note_gray">#303036</color>
+    <color name="icon_tint">#9DB8B3</color>
 
-    <color name="deadline_normal">#C8C5D0</color>
-    <color name="deadline_soon">#FFB95C</color>
+    <color name="note_default">#1C1C24</color>
+    <color name="note_red">#3B2625</color>
+    <color name="note_orange">#3A2E22</color>
+    <color name="note_yellow">#38331F</color>
+    <color name="note_green">#28352A</color>
+    <color name="note_teal">#223634</color>
+    <color name="note_blue">#242F3D</color>
+    <color name="note_indigo">#2A2D45</color>
+    <color name="note_purple">#2F2A3D</color>
+    <color name="note_pink">#3A2731</color>
+    <color name="note_brown">#332B26</color>
+    <color name="note_gray">#26262E</color>
+
+    <color name="pill_background">#14CEE0DF</color>
+    <color name="deadline_normal">#BFD3CF</color>
+    <color name="deadline_soon">#FFC46B</color>
     <color name="deadline_overdue">#FFB4AB</color>
 
-    <color name="ripple">#33FFFFFF</color>
-    <color name="pill_background">#26FFFFFF</color>
+    <color name="ripple">#33CEE0DF</color>
 </resources>

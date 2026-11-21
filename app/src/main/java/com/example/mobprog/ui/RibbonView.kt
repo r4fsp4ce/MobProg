@@ -34,6 +34,9 @@ class RibbonView @JvmOverloads constructor(
         fun onRedo()
         fun onDiscard()
         fun onSave()
+
+        /** Only the full editor offers raw Markdown; the quick-note ribbon leaves it hidden. */
+        fun onRawMarkdown() = Unit
     }
 
     private val binding = ViewRibbonBinding.inflate(LayoutInflater.from(context), this, true)
@@ -52,6 +55,7 @@ class RibbonView @JvmOverloads constructor(
         binding.ribbonColor.setOnClickListener { listener?.onColor() }
         binding.ribbonUndo.setOnClickListener { listener?.onUndo() }
         binding.ribbonRedo.setOnClickListener { listener?.onRedo() }
+        binding.ribbonRawMarkdown.setOnClickListener { listener?.onRawMarkdown() }
         binding.ribbonDiscard.setOnClickListener { listener?.onDiscard() }
         binding.ribbonSave.setOnClickListener { listener?.onSave() }
     }
@@ -70,6 +74,11 @@ class RibbonView @JvmOverloads constructor(
     fun setRedoEnabled(enabled: Boolean) {
         binding.ribbonRedo.isEnabled = enabled
         binding.ribbonRedo.alpha = if (enabled) 1f else 0.4f
+    }
+
+    /** The raw-Markdown button only appears while text is being edited and the option is on. */
+    fun showRawMarkdown(visible: Boolean) {
+        binding.ribbonRawMarkdown.isVisible = visible
     }
 
     fun showListType(type: EntryType) {
@@ -95,13 +104,15 @@ class RibbonView @JvmOverloads constructor(
 
     fun showColor(color: NoteColor) {
         val fill = ContextCompat.getColor(context, color.colorRes)
-        val stroke = ContextCompat.getColor(context, R.color.color_outline)
+        val stroke = ContextCompat.getColor(context, R.color.icon_tint)
+        val size = dp(20)
         val dot = GradientDrawable().apply {
             shape = GradientDrawable.OVAL
             setColor(fill)
-            setStroke(dp(1), stroke)
+            setStroke(dp(2), stroke)
+            setSize(size, size)
         }
-        val padding = dp(12)
+        val padding = dp(10)
         binding.ribbonColor.setPadding(padding, padding, padding, padding)
         binding.ribbonColor.setImageDrawable(dot)
         binding.ribbonColor.imageTintList = null

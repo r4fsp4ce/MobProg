@@ -22,54 +22,197 @@
         <item name="colorSurfaceContainer">@color/color_surface_container</item>
         <item name="colorSurfaceContainerHigh">@color/color_surface_container_high</item>
         <item name="colorSurfaceContainerHighest">@color/color_surface_container_highest</item>
+        <item name="colorAccent">@color/color_accent</item>
+        <item name="android:colorControlActivated">@color/color_accent</item>
+        <item name="fontFamily">@font/inconsolata</item>
+        <item name="android:fontFamily">@font/inconsolata</item>
+        <item name="android:textViewStyle">@style/Widget.Tudow.TextView</item>
+        <item name="editTextStyle">@style/Widget.Tudow.EditText</item>
+        <item name="textAppearanceDisplayLarge">@style/TextAppearance.Tudow.DisplayLarge</item>
+        <item name="textAppearanceDisplayMedium">@style/TextAppearance.Tudow.DisplayMedium</item>
+        <item name="textAppearanceDisplaySmall">@style/TextAppearance.Tudow.DisplaySmall</item>
+        <item name="textAppearanceHeadlineLarge">@style/TextAppearance.Tudow.HeadlineLarge</item>
+        <item name="textAppearanceHeadlineMedium">@style/TextAppearance.Tudow.HeadlineMedium</item>
+        <item name="textAppearanceHeadlineSmall">@style/TextAppearance.Tudow.HeadlineSmall</item>
+        <item name="textAppearanceTitleLarge">@style/TextAppearance.Tudow.TitleLarge</item>
+        <item name="textAppearanceTitleMedium">@style/TextAppearance.Tudow.TitleMedium</item>
+        <item name="textAppearanceTitleSmall">@style/TextAppearance.Tudow.TitleSmall</item>
+        <item name="textAppearanceBodyLarge">@style/TextAppearance.Tudow.BodyLarge</item>
+        <item name="textAppearanceBodyMedium">@style/TextAppearance.Tudow.BodyMedium</item>
+        <item name="textAppearanceBodySmall">@style/TextAppearance.Tudow.BodySmall</item>
+        <item name="textAppearanceLabelLarge">@style/TextAppearance.Tudow.LabelLarge</item>
+        <item name="textAppearanceLabelMedium">@style/TextAppearance.Tudow.LabelMedium</item>
+        <item name="textAppearanceLabelSmall">@style/TextAppearance.Tudow.LabelSmall</item>
         <item name="android:windowBackground">@color/color_window_background</item>
         <item name="android:colorBackground">@color/color_window_background</item>
         <item name="materialCardViewStyle">@style/Widget.Tudow.Card</item>
         <item name="toolbarStyle">@style/Widget.Tudow.Toolbar</item>
+        <item name="navigationViewStyle">@style/Widget.Tudow.NavigationView</item>
     </style>
 
     <style name="Theme.MobProg" parent="Base.Theme.MobProg" />
 
+    <!-- One monospace family across the Material 3 type scale. -->
+    <style name="Widget.Tudow.TextView" parent="Widget.AppCompat.TextView">
+        <item name="android:fontFamily">@font/inconsolata</item>
+        <item name="fontFamily">@font/inconsolata</item>
+    </style>
+
+    <style name="Widget.Tudow.EditText" parent="Widget.AppCompat.EditText">
+        <item name="android:fontFamily">@font/inconsolata</item>
+        <item name="fontFamily">@font/inconsolata</item>
+    </style>
+
+    <style name="TextAppearance.Tudow.DisplayLarge" parent="TextAppearance.Material3.DisplayLarge">
+        <item name="android:fontFamily">@font/inconsolata</item>
+        <item name="fontFamily">@font/inconsolata</item>
+    </style>
+
+    <style name="TextAppearance.Tudow.DisplayMedium" parent="TextAppearance.Material3.DisplayMedium">
+        <item name="android:fontFamily">@font/inconsolata</item>
+        <item name="fontFamily">@font/inconsolata</item>
+    </style>
+
+    <style name="TextAppearance.Tudow.DisplaySmall" parent="TextAppearance.Material3.DisplaySmall">
+        <item name="android:fontFamily">@font/inconsolata</item>
+        <item name="fontFamily">@font/inconsolata</item>
+    </style>
+
+    <style name="TextAppearance.Tudow.HeadlineLarge" parent="TextAppearance.Material3.HeadlineLarge">
+        <item name="android:fontFamily">@font/inconsolata</item>
+        <item name="fontFamily">@font/inconsolata</item>
+    </style>
+
+    <style name="TextAppearance.Tudow.HeadlineMedium" parent="TextAppearance.Material3.HeadlineMedium">
+        <item name="android:fontFamily">@font/inconsolata</item>
+        <item name="fontFamily">@font/inconsolata</item>
+    </style>
+
+    <style name="TextAppearance.Tudow.HeadlineSmall" parent="TextAppearance.Material3.HeadlineSmall">
+        <item name="android:fontFamily">@font/inconsolata</item>
+        <item name="fontFamily">@font/inconsolata</item>
+    </style>
+
+    <style name="TextAppearance.Tudow.TitleLarge" parent="TextAppearance.Material3.TitleLarge">
+        <item name="android:fontFamily">@font/inconsolata</item>
+        <item name="fontFamily">@font/inconsolata</item>
+    </style>
+
+    <style name="TextAppearance.Tudow.TitleMedium" parent="TextAppearance.Material3.TitleMedium">
+        <item name="android:fontFamily">@font/inconsolata</item>
+        <item name="fontFamily">@font/inconsolata</item>
+    </style>
+
+    <style name="TextAppearance.Tudow.TitleSmall" parent="TextAppearance.Material3.TitleSmall">
+        <item name="android:fontFamily">@font/inconsolata</item>
+        <item name="fontFamily">@font/inconsolata</item>
+    </style>
+
+    <style name="TextAppearance.Tudow.BodyLarge" parent="TextAppearance.Material3.BodyLarge">
+        <item name="android:fontFamily">@font/inconsolata</item>
+        <item name="fontFamily">@font/inconsolata</item>
+    </style>
+
+    <style name="TextAppearance.Tudow.BodyMedium" parent="TextAppearance.Material3.BodyMedium">
+        <item name="android:fontFamily">@font/inconsolata</item>
+        <item name="fontFamily">@font/inconsolata</item>
+    </style>
+
+    <style name="TextAppearance.Tudow.BodySmall" parent="TextAppearance.Material3.BodySmall">
+        <item name="android:fontFamily">@font/inconsolata</item>
+        <item name="fontFamily">@font/inconsolata</item>
+    </style>
+
+    <style name="TextAppearance.Tudow.LabelLarge" parent="TextAppearance.Material3.LabelLarge">
+        <item name="android:fontFamily">@font/inconsolata</item>
+        <item name="fontFamily">@font/inconsolata</item>
+    </style>
+
+    <style name="TextAppearance.Tudow.LabelMedium" parent="TextAppearance.Material3.LabelMedium">
+        <item name="android:fontFamily">@font/inconsolata</item>
+        <item name="fontFamily">@font/inconsolata</item>
+    </style>
+
+    <style name="TextAppearance.Tudow.LabelSmall" parent="TextAppearance.Material3.LabelSmall">
+        <item name="android:fontFamily">@font/inconsolata</item>
+        <item name="fontFamily">@font/inconsolata</item>
+    </style>
+
+    <!-- Tonal card: no shadow, one hairline outline. -->
     <style name="Widget.Tudow.Card" parent="Widget.Material3.CardView.Elevated">
         <item name="cardCornerRadius">@dimen/card_corner</item>
         <item name="cardElevation">@dimen/card_elevation</item>
-        <item name="strokeWidth">0dp</item>
+        <item name="strokeWidth">@dimen/card_stroke</item>
+        <item name="strokeColor">@color/color_hairline</item>
+        <item name="rippleColor">@color/ripple</item>
     </style>
 
     <style name="Widget.Tudow.Toolbar" parent="Widget.Material3.Toolbar">
         <item name="android:background">@android:color/transparent</item>
-        <item name="titleTextAppearance">@style/TextAppearance.Tudow.ToolbarTitle</item>
+        <item name="titleTextAppearance">@style/TextAppearance.Tudow.ScreenTitle</item>
     </style>
 
-    <style name="TextAppearance.Tudow.ToolbarTitle" parent="TextAppearance.Material3.TitleLarge">
+    <style name="TextAppearance.Tudow.ScreenTitle" parent="TextAppearance.Material3.HeadlineSmall">
+        <item name="android:fontFamily">@font/inconsolata</item>
+        <item name="fontFamily">@font/inconsolata</item>
+        <item name="android:textSize">@dimen/text_screen_title</item>
         <item name="android:textStyle">bold</item>
+        <item name="android:letterSpacing">-0.01</item>
     </style>
 
-    <!-- Section label in the drawer and filter sheet. -->
     <style name="TextAppearance.Tudow.Label" parent="TextAppearance.Material3.LabelLarge">
+        <item name="android:fontFamily">@font/inconsolata</item>
+        <item name="fontFamily">@font/inconsolata</item>
         <item name="android:textColor">@color/color_on_surface_variant</item>
+        <item name="android:letterSpacing">0.02</item>
     </style>
 
     <!-- Small pill used for priority and deadline on cards. -->
     <style name="Widget.Tudow.Pill" parent="Widget.AppCompat.TextView">
         <item name="android:background">@drawable/bg_pill</item>
+        <item name="android:fontFamily">@font/inconsolata</item>
+        <item name="fontFamily">@font/inconsolata</item>
         <item name="android:paddingStart">@dimen/chip_padding_h</item>
         <item name="android:paddingEnd">@dimen/chip_padding_h</item>
         <item name="android:paddingTop">@dimen/chip_padding_v</item>
         <item name="android:paddingBottom">@dimen/chip_padding_v</item>
-        <item name="android:drawablePadding">@dimen/space_xs</item>
-        <item name="android:textSize">12sp</item>
+        <item name="android:drawablePadding">3dp</item>
+        <item name="android:textSize">@dimen/text_pill</item>
         <item name="android:gravity">center_vertical</item>
         <item name="android:maxLines">1</item>
+        <item name="android:ellipsize">end</item>
     </style>
 
-    <style name="Widget.Tudow.RibbonButton" parent="Widget.Material3.Button.IconButton">
-        <item name="android:layout_width">@dimen/touch_target</item>
-        <item name="android:layout_height">@dimen/touch_target</item>
-        <item name="iconTint">@color/color_on_surface_variant</item>
+    <style name="Widget.Tudow.RibbonButton" parent="">
+        <item name="android:layout_width">40dp</item>
+        <item name="android:layout_height">40dp</item>
+        <item name="android:padding">9dp</item>
+        <item name="android:scaleType">fitCenter</item>
+    </style>
+
+    <style name="Widget.Tudow.NavigationView" parent="Widget.Material3.NavigationView">
+        <item name="itemShapeFillColor">@color/nav_item_fill</item>
+        <item name="itemShapeAppearance">@style/ShapeAppearance.Tudow.NavItem</item>
+        <item name="itemShapeInsetStart">8dp</item>
+        <item name="itemShapeInsetEnd">8dp</item>
+        <item name="itemShapeInsetTop">2dp</item>
+        <item name="itemShapeInsetBottom">2dp</item>
+        <item name="itemIconTint">@color/nav_item_colors</item>
+        <item name="itemTextColor">@color/nav_item_colors</item>
+        <item name="android:background">@color/color_surface</item>
     </style>
 
     <style name="Widget.Tudow.Dialog" parent="ThemeOverlay.Material3.MaterialAlertDialog">
         <item name="alertDialogStyle">@style/MaterialAlertDialog.Material3</item>
+    </style>
+
+    <style name="ShapeAppearance.Tudow.NavItem" parent="ShapeAppearance.Material3.Corner.Medium">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">14dp</item>
+    </style>
+
+    <style name="ShapeAppearance.Tudow.Fab" parent="">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">50%</item>
     </style>
 </resources>

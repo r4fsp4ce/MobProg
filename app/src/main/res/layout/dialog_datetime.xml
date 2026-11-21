@@ -168,14 +168,16 @@
                 style="@style/Widget.Material3.Button.TextButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/action_cancel" />
+                android:text="@string/action_cancel"
+                android:textColor="?attr/colorPrimary" />
 
             <Button
                 android:id="@+id/deadline_ok"
                 style="@style/Widget.Material3.Button.TextButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/action_confirm" />
+                android:text="@string/action_confirm"
+                android:textColor="?attr/colorPrimary" />
         </LinearLayout>
     </LinearLayout>
 </com.google.android.material.card.MaterialCardView>

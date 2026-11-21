@@ -9,6 +9,7 @@
         android:id="@+id/entry_checkbox"
         android:layout_width="wrap_content"
         android:layout_height="@dimen/touch_target"
+        android:buttonTint="@color/checkbox_tint"
         android:visibility="gone" />
 
     <TextView
@@ -52,12 +53,13 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/space_xxs"
         android:clickable="true"
-        android:drawableStart="@drawable/ic_clock"
-        android:drawablePadding="@dimen/space_xxs"
+        android:drawableStart="@drawable/ic_clock_small"
+        android:drawablePadding="2dp"
         android:focusable="true"
         android:foreground="?attr/selectableItemBackground"
         android:gravity="center"
-        android:minHeight="@dimen/touch_target"
+        android:paddingTop="3dp"
+        android:paddingBottom="3dp"
         android:textColor="?attr/colorOnSurface"
         android:visibility="gone" />
 </LinearLayout>

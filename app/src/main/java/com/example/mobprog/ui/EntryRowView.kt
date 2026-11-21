@@ -1,6 +1,7 @@
 package com.example.mobprog.ui
 
 import android.content.Context
+import android.graphics.Paint
 import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.widget.LinearLayout
@@ -25,6 +26,7 @@ class EntryRowView @JvmOverloads constructor(
         private set
 
     var onFocus: ((EntryRowView) -> Unit)? = null
+    var onBlur: ((EntryRowView) -> Unit)? = null
     var onDeadlineClick: ((EntryRowView) -> Unit)? = null
     var onDeadlineLongClick: ((EntryRowView) -> Unit)? = null
     var onContentChanged: (() -> Unit)? = null
@@ -36,13 +38,14 @@ class EntryRowView @JvmOverloads constructor(
         orientation = HORIZONTAL
         binding.entryCheckbox.setOnCheckedChangeListener { _, checked ->
             draft.checked = checked
+            applyCheckedStyle()
             if (!bindingValues) {
                 onFocus?.invoke(this)
                 onContentChanged?.invoke()
             }
         }
         binding.entryText.setOnFocusChangeListener { _, hasFocus ->
-            if (hasFocus) onFocus?.invoke(this)
+            if (hasFocus) onFocus?.invoke(this) else onBlur?.invoke(this)
         }
         binding.entryDeadline.setOnClickListener { onDeadlineClick?.invoke(this) }
         binding.entryDeadline.setOnLongClickListener {
@@ -61,6 +64,7 @@ class EntryRowView @JvmOverloads constructor(
         applyType()
         applyPriority()
         applyDeadline()
+        applyCheckedStyle()
     }
 
     fun collect(): EntryDraft {
@@ -72,6 +76,7 @@ class EntryRowView @JvmOverloads constructor(
     fun setType(type: EntryType) {
         draft.type = type
         applyType()
+        applyCheckedStyle()
     }
 
     fun setSlot(index: Int) {
@@ -86,7 +91,8 @@ class EntryRowView @JvmOverloads constructor(
         binding.entryPriority.isVisible = priority != Priority.NONE
         binding.entryPriority.text = priority.badge
         if (priority != Priority.NONE) {
-            binding.entryPriority.contentDescription = context.getString(R.string.priority_badge, priority.value)
+            binding.entryPriority.contentDescription =
+                context.getString(R.string.priority_label, context.getString(priority.labelRes))
         }
     }
 
@@ -109,6 +115,17 @@ class EntryRowView @JvmOverloads constructor(
 
     fun focusText() {
         binding.entryText.requestFocus()
+    }
+
+    /** Checked checkboxes are struck through, and typing keeps the line-through. */
+    private fun applyCheckedStyle() {
+        val strike = draft.type == EntryType.CHECKBOX && draft.checked
+        val flags = binding.entryText.paintFlags
+        binding.entryText.paintFlags = if (strike) {
+            flags or Paint.STRIKE_THRU_TEXT_FLAG
+        } else {
+            flags and Paint.STRIKE_THRU_TEXT_FLAG.inv()
+        }
     }
 
     private fun applyType() {

@@ -14,9 +14,16 @@
             android:id="@+id/toolbar"
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
+            android:paddingStart="@dimen/space_xs"
+            android:paddingEnd="@dimen/space_xs"
             app:navigationContentDescription="@string/cd_back"
             app:navigationIcon="@drawable/ic_close"
             app:title="@string/folders_title" />
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/divider"
+            android:background="@color/color_hairline" />
 
         <FrameLayout
             android:layout_width="match_parent"
@@ -28,6 +35,9 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:clipToPadding="false"
+                android:paddingStart="@dimen/space_s"
+                android:paddingTop="@dimen/space_s"
+                android:paddingEnd="@dimen/space_s"
                 android:paddingBottom="88dp" />
 
             <include
@@ -43,5 +53,8 @@
         android:layout_gravity="bottom|end"
         android:layout_margin="@dimen/space_l"
         android:contentDescription="@string/action_add_folder"
-        android:src="@drawable/ic_add" />
+        android:src="@drawable/ic_add"
+        app:backgroundTint="@color/color_accent"
+        app:shapeAppearanceOverlay="@style/ShapeAppearance.Tudow.Fab"
+        app:tint="@color/color_on_accent" />
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

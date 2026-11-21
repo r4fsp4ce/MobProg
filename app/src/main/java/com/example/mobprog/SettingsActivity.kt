@@ -16,13 +16,17 @@ import androidx.core.view.isVisible
 import com.example.mobprog.databinding.ActivitySettingsBinding
 import com.example.mobprog.notify.Notifications
 import com.example.mobprog.service.ChatHeadService
+import com.example.mobprog.service.QuickNotePrefs
+import com.example.mobprog.util.EditorPrefs
 import com.example.mobprog.util.Insets
+import com.example.mobprog.util.ThemePrefs
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 
 class SettingsActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivitySettingsBinding
     private var suppressSwitch = false
+    private var suppressEditorSwitch = false
     private var awaitingOverlayPermission = false
 
     private val notificationPermission =
@@ -37,21 +41,30 @@ class SettingsActivity : AppCompatActivity() {
 
         binding.toolbar.setNavigationOnClickListener { finish() }
 
+        binding.rowTheme.setOnClickListener { showThemeDialog() }
+
+        binding.switchRawMarkdown.setOnCheckedChangeListener { _, isChecked ->
+            if (suppressEditorSwitch) return@setOnCheckedChangeListener
+            EditorPrefs.setRawMarkdownEnabled(this, isChecked)
+        }
+
         binding.switchOverlay.setOnCheckedChangeListener { _, isChecked ->
             if (suppressSwitch) return@setOnCheckedChangeListener
             if (isChecked) {
-                if (Settings.canDrawOverlays(this)) {
+                if (QuickNotePrefs.canDrawOverlays(this)) {
+                    QuickNotePrefs.setEnabled(this, true)
                     startBubble()
                 } else {
                     requestOverlayPermission()
                 }
             } else {
+                QuickNotePrefs.setEnabled(this, false)
                 stopService(Intent(this, ChatHeadService::class.java))
             }
         }
 
         binding.buttonOverlaySettings.setOnClickListener {
-            if (Settings.canDrawOverlays(this)) {
+            if (QuickNotePrefs.canDrawOverlays(this)) {
                 startActivity(systemOverlaySettingsIntent())
             } else {
                 requestOverlayPermission()
@@ -79,7 +92,8 @@ class SettingsActivity : AppCompatActivity() {
         refresh()
         if (awaitingOverlayPermission) {
             awaitingOverlayPermission = false
-            if (Settings.canDrawOverlays(this)) {
+            if (QuickNotePrefs.canDrawOverlays(this)) {
+                QuickNotePrefs.setEnabled(this, true)
                 startBubble()
             } else {
                 toast(R.string.settings_overlay_denied_message)
@@ -88,10 +102,16 @@ class SettingsActivity : AppCompatActivity() {
     }
 
     private fun refresh() {
+        binding.themeStatus.setText(ThemePrefs.labelRes(ThemePrefs.mode(this)))
+        suppressEditorSwitch = true
+        binding.switchRawMarkdown.isChecked = EditorPrefs.isRawMarkdownEnabled(this)
+        suppressEditorSwitch = false
+
+        val canDraw = QuickNotePrefs.canDrawOverlays(this)
         suppressSwitch = true
-        binding.switchOverlay.isChecked = Settings.canDrawOverlays(this)
+        binding.switchOverlay.isChecked = QuickNotePrefs.isEnabled(this) && canDraw
         suppressSwitch = false
-        binding.buttonOverlaySettings.isVisible = !Settings.canDrawOverlays(this)
+        binding.buttonOverlaySettings.isVisible = !canDraw
 
         val canNotify = Notifications.canPost(this)
         binding.notificationStatus.setText(
@@ -110,6 +130,20 @@ class SettingsActivity : AppCompatActivity() {
 
     private fun startBubble() {
         ContextCompat.startForegroundService(this, Intent(this, ChatHeadService::class.java))
+    }
+
+    private fun showThemeDialog() {
+        val modes = ThemePrefs.modes
+        val labels = modes.map { getString(ThemePrefs.labelRes(it)) }.toTypedArray()
+        val checked = modes.indexOf(ThemePrefs.mode(this)).coerceAtLeast(0)
+        MaterialAlertDialogBuilder(this)
+            .setTitle(R.string.settings_theme_title)
+            .setSingleChoiceItems(labels, checked) { dialog, which ->
+                ThemePrefs.setMode(this, modes[which])
+                dialog.dismiss()
+            }
+            .setNegativeButton(R.string.action_cancel, null)
+            .show()
     }
 
     private fun requestOverlayPermission() {

@@ -1,22 +1,24 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:background="?attr/selectableItemBackground"
     android:clickable="true"
     android:focusable="true"
     android:gravity="center_vertical"
-    android:minHeight="64dp"
+    android:minHeight="62dp"
     android:orientation="horizontal"
     android:paddingStart="@dimen/space_l"
     android:paddingEnd="@dimen/space_xs">
 
     <ImageView
         android:id="@+id/folder_icon"
-        android:layout_width="@dimen/icon_m"
-        android:layout_height="@dimen/icon_m"
+        android:layout_width="20dp"
+        android:layout_height="20dp"
         android:contentDescription="@null"
-        android:src="@drawable/ic_folder" />
+        android:src="@drawable/ic_folder"
+        app:tint="?attr/colorPrimary" />
 
     <LinearLayout
         android:layout_width="0dp"
@@ -31,15 +33,15 @@
             android:layout_height="wrap_content"
             android:ellipsize="end"
             android:maxLines="1"
-            android:textAppearance="?attr/textAppearanceTitleMedium"
-            android:textColor="?attr/colorOnSurface" />
+            android:textColor="?attr/colorOnSurface"
+            android:textSize="15sp" />
 
         <TextView
             android:id="@+id/folder_count"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:textAppearance="?attr/textAppearanceBodySmall"
-            android:textColor="?attr/colorOnSurfaceVariant" />
+            android:textColor="?attr/colorOnSurfaceVariant"
+            android:textSize="11sp" />
     </LinearLayout>
 
     <ImageButton
@@ -47,6 +49,7 @@
         android:layout_width="@dimen/touch_target"
         android:layout_height="@dimen/touch_target"
         android:background="?attr/selectableItemBackgroundBorderless"
-        android:padding="@dimen/space_m"
-        android:src="@drawable/ic_more_vert" />
+        android:padding="15dp"
+        android:src="@drawable/ic_more_vert"
+        app:tint="?attr/colorOnSurfaceVariant" />
 </LinearLayout>

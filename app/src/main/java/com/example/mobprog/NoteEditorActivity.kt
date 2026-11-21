@@ -1,10 +1,13 @@
 package com.example.mobprog
 
 import android.content.Intent
+import android.graphics.Typeface
 import android.os.Bundle
 import android.view.View
 import android.widget.LinearLayout
 import android.widget.PopupMenu
+import android.widget.ScrollView
+import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.OnBackPressedCallback
@@ -30,7 +33,9 @@ import com.example.mobprog.ui.BlockEditorView
 import com.example.mobprog.ui.DateTimeDialog
 import com.example.mobprog.ui.EntryRowView
 import com.example.mobprog.ui.RibbonView
+import com.example.mobprog.util.EditorPrefs
 import com.example.mobprog.util.Insets
+import com.example.mobprog.util.NoteMarkdown
 import com.example.mobprog.util.Threads
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import java.util.ArrayDeque
@@ -52,6 +57,7 @@ class NoteEditorActivity : AppCompatActivity(), RibbonView.Listener, BlockEditor
     private var noteId: Long = -1L
     private var initialFolderId: Long = -1L
     private var focusedRow: EntryRowView? = null
+    private var editorFocused = false
 
     private val blockViews = mutableListOf<BlockEditorView>()
     private val undoShelf = ArrayDeque<NoteDraft>()
@@ -79,6 +85,7 @@ class NoteEditorActivity : AppCompatActivity(), RibbonView.Listener, BlockEditor
         ribbon = binding.ribbon
         ribbon.listener = this
         ribbon.showUndoRedo(true)
+        ribbon.showRawMarkdown(false)
 
         noteId = intent.getLongExtra(EXTRA_NOTE_ID, -1L)
         initialFolderId = intent.getLongExtra(EXTRA_FOLDER_ID, -1L)
@@ -100,12 +107,21 @@ class NoteEditorActivity : AppCompatActivity(), RibbonView.Listener, BlockEditor
         binding.titleInput.doAfterTextChanged {
             if (!loading) noteTextChanged()
         }
+        binding.titleInput.setOnFocusChangeListener { _, hasFocus ->
+            editorFocused = hasFocus
+            refreshRawMarkdownButton()
+        }
 
         onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
             override fun handleOnBackPressed() = requestDiscard()
         })
 
         load()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        refreshRawMarkdownButton()
     }
 
     // region loading and rendering
@@ -143,6 +159,7 @@ class NoteEditorActivity : AppCompatActivity(), RibbonView.Listener, BlockEditor
         textSnapshotTaken = false
         textBaseline = collectDraft()
         updateUndoRedo()
+        refreshRawMarkdownButton()
     }
 
     private fun rebuildBlocks() {
@@ -162,6 +179,7 @@ class NoteEditorActivity : AppCompatActivity(), RibbonView.Listener, BlockEditor
             blockViews += view
         }
         focusedRow = null
+        editorFocused = false
         if (blockViews.isEmpty()) {
             addBlock()
         }
@@ -364,6 +382,31 @@ class NoteEditorActivity : AppCompatActivity(), RibbonView.Listener, BlockEditor
 
     override fun onSave() = save()
 
+    override fun onRawMarkdown() = showRawMarkdown()
+
+    /** The button is opt-in and only shows while a field has the cursor. */
+    private fun refreshRawMarkdownButton() {
+        ribbon.showRawMarkdown(EditorPrefs.isRawMarkdownEnabled(this) && editorFocused)
+    }
+
+    private fun showRawMarkdown() {
+        val markdown = NoteMarkdown.from(collectDraft())
+        val pad = (20 * resources.displayMetrics.density).toInt()
+        val text = TextView(this).apply {
+            text = markdown.ifBlank { getString(R.string.raw_markdown_empty) }
+            typeface = Typeface.MONOSPACE
+            textSize = 13f
+            setTextIsSelectable(true)
+            setTextColor(ContextCompat.getColor(this@NoteEditorActivity, R.color.color_on_surface))
+            setPadding(pad, pad, pad, pad)
+        }
+        MaterialAlertDialogBuilder(this)
+            .setTitle(R.string.raw_markdown_title)
+            .setView(ScrollView(this).apply { addView(text) })
+            .setPositiveButton(R.string.action_close, null)
+            .show()
+    }
+
     // endregion
 
     // region block callbacks
@@ -390,8 +433,15 @@ class NoteEditorActivity : AppCompatActivity(), RibbonView.Listener, BlockEditor
 
     override fun onEntryFocused(row: EntryRowView) {
         focusedRow = row
+        editorFocused = true
         ribbon.showListType(row.draft.type)
         ribbon.showPriority(row.draft.priority)
+        refreshRawMarkdownButton()
+    }
+
+    override fun onEntryBlur(row: EntryRowView) {
+        editorFocused = binding.titleInput.hasFocus()
+        refreshRawMarkdownButton()
     }
 
     override fun onEntryDeadline(row: EntryRowView) {

@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <shape xmlns:android="http://schemas.android.com/apk/res/android"
     android:shape="rectangle">
-    <solid android:color="@color/color_window_background" />
+    <solid android:color="@color/color_surface" />
+    <corners android:radius="@dimen/ribbon_corner" />
     <stroke
-        android:width="@dimen/divider"
-        android:color="@color/color_outline_variant" />
+        android:width="@dimen/card_stroke"
+        android:color="@color/color_hairline" />
 </shape>

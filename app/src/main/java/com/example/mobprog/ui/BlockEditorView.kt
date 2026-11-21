@@ -27,6 +27,7 @@ class BlockEditorView @JvmOverloads constructor(
         fun onBlockDown(view: BlockEditorView)
         fun onBlockDelete(view: BlockEditorView)
         fun onEntryFocused(row: EntryRowView)
+        fun onEntryBlur(row: EntryRowView)
         fun onEntryDeadline(row: EntryRowView)
         fun onEntryDeadlineLong(row: EntryRowView)
         fun onContentChanged()
@@ -43,7 +44,7 @@ class BlockEditorView @JvmOverloads constructor(
     init {
         orientation = VERTICAL
         binding.blockHeading.doAfterTextChanged { callback?.onContentChanged() }
-        binding.blockAddEntry.setOnClickListener { addEntry() }
+        binding.blockAddEntry.setOnClickListener { addEntry(requestFocus = true) }
         binding.blockUp.setOnClickListener { callback?.onBlockUp(this) }
         binding.blockDown.setOnClickListener { callback?.onBlockDown(this) }
         binding.blockDelete.setOnClickListener { callback?.onBlockDelete(this) }
@@ -99,6 +100,7 @@ class BlockEditorView @JvmOverloads constructor(
         val row = EntryRowView(context)
         row.bind(entry, slot)
         row.onFocus = { callback?.onEntryFocused(it) }
+        row.onBlur = { callback?.onEntryBlur(it) }
         row.onDeadlineClick = { callback?.onEntryDeadline(it) }
         row.onDeadlineLongClick = { callback?.onEntryDeadlineLong(it) }
         row.onContentChanged = { callback?.onContentChanged() }

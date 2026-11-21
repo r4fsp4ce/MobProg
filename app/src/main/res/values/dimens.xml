@@ -13,26 +13,38 @@
     <dimen name="touch_target">48dp</dimen>
     <dimen name="icon_s">20dp</dimen>
     <dimen name="icon_m">24dp</dimen>
+    <dimen name="icon_pill">12dp</dimen>
 
-    <!-- Cards -->
-    <dimen name="card_corner">16dp</dimen>
-    <dimen name="card_elevation">1dp</dimen>
+    <!-- Surfaces -->
+    <dimen name="card_corner">18dp</dimen>
+    <dimen name="card_elevation">0dp</dimen>
     <dimen name="card_elevation_drag">8dp</dimen>
-    <dimen name="card_padding">@dimen/space_m</dimen>
-    <dimen name="grid_gap">@dimen/space_s</dimen>
+    <dimen name="card_padding">12dp</dimen>
+    <dimen name="card_stroke">1dp</dimen>
+    <dimen name="grid_gap">5dp</dimen>
+    <dimen name="screen_padding">14dp</dimen>
 
-    <!-- Chips and badges -->
-    <dimen name="chip_corner">10dp</dimen>
-    <dimen name="chip_padding_h">8dp</dimen>
+    <!-- Chips, pills, badges -->
+    <dimen name="chip_corner">999dp</dimen>
+    <dimen name="chip_padding_h">5dp</dimen>
     <dimen name="chip_padding_v">2dp</dimen>
     <dimen name="badge_dot">14dp</dimen>
+    <dimen name="search_corner">999dp</dimen>
+    <dimen name="search_height">48dp</dimen>
 
     <!-- Editor -->
-    <dimen name="editor_max_width">720dp</dimen>
-    <dimen name="block_corner">12dp</dimen>
-    <dimen name="ribbon_height">56dp</dimen>
+    <dimen name="block_corner">18dp</dimen>
+    <dimen name="ribbon_height">52dp</dimen>
+    <dimen name="ribbon_corner">999dp</dimen>
+    <dimen name="ribbon_margin">10dp</dimen>
     <dimen name="divider">1dp</dimen>
 
+    <!-- Type -->
+    <dimen name="text_screen_title">22sp</dimen>
+    <dimen name="text_card_title">13sp</dimen>
+    <dimen name="text_meta">11sp</dimen>
+    <dimen name="text_pill">10sp</dimen>
+
     <!-- Empty state -->
-    <dimen name="empty_illustration">120dp</dimen>
+    <dimen name="empty_illustration">112dp</dimen>
 </resources>

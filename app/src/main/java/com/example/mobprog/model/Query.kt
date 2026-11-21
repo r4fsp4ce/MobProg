@@ -31,7 +31,11 @@ data class NoteFilter(
     val status: StatusFilter = StatusFilter.ANY
 ) {
     val isActive: Boolean
-        get() = colors.isNotEmpty() || priorities.isNotEmpty() || hasDeadline || status != StatusFilter.ANY
+        get() = hasCustomFilter || hasDeadline || status != StatusFilter.ANY
+
+    /** Colour/priority picks made in the sheet; the quick chips are presets, not filters. */
+    val hasCustomFilter: Boolean
+        get() = colors.isNotEmpty() || priorities.isNotEmpty()
 
     fun cleared(): NoteFilter = NoteFilter()
 }

@@ -1,21 +1,22 @@
 package com.example.mobprog
 
 import android.content.Intent
+import android.content.res.ColorStateList
+import android.content.res.Configuration
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
-import android.view.MenuItem
 import android.view.View
 import android.widget.Toast
-import androidx.activity.enableEdgeToEdge
 import androidx.activity.OnBackPressedCallback
+import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.PopupMenu
-import androidx.appcompat.widget.SearchView
 import androidx.core.content.ContextCompat
 import androidx.core.view.GravityCompat
 import androidx.core.view.isVisible
+import androidx.core.widget.doAfterTextChanged
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
@@ -25,15 +26,21 @@ import com.example.mobprog.data.StoreProvider
 import com.example.mobprog.data.TodoStore
 import com.example.mobprog.databinding.ActivityMainBinding
 import com.example.mobprog.model.Folder
+import com.example.mobprog.model.NoteColor
 import com.example.mobprog.model.NoteFilter
 import com.example.mobprog.model.NoteQuery
 import com.example.mobprog.model.NoteSort
 import com.example.mobprog.model.NoteSummary
 import com.example.mobprog.model.NoteView
+import com.example.mobprog.model.Priority
+import com.example.mobprog.model.StatusFilter
+import com.example.mobprog.service.ChatHeadService
+import com.example.mobprog.service.QuickNotePrefs
 import com.example.mobprog.ui.FilterSheet
 import com.example.mobprog.ui.NoteDragCallback
 import com.example.mobprog.ui.NotesAdapter
 import com.example.mobprog.util.Insets
+import com.example.mobprog.util.ThemePrefs
 import com.example.mobprog.util.Threads
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.Snackbar
@@ -58,6 +65,8 @@ class MainActivity : AppCompatActivity() {
     private val folderMenuIds = LinkedHashMap<Int, Long>()
     private val mainHandler = Handler(Looper.getMainLooper())
     private val reloadTask = Runnable { loadNotes() }
+
+    private var suppressQuickChips = false
 
     private val editorLauncher =
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
@@ -110,26 +119,35 @@ class MainActivity : AppCompatActivity() {
         enableEdgeToEdge()
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
-        Insets.applySystemBars(binding.drawerRoot)
-
-        setSupportActionBar(binding.toolbar)
-        binding.toolbar.inflateMenu(R.menu.main_toolbar)
+        Insets.applyTopInset(binding.appBar)
+        Insets.applyBottomInset(binding.noteGrid)
+        Insets.applySystemBars(binding.navView)
 
         restoreState(savedInstanceState)
-        setupToolbar()
+        setupAppBar()
         setupList()
         setupDrawer()
         registerFilterListener()
         registerBackHandling()
 
+        syncQuickChips()
+        updateFilterIndicator()
         refreshFolders()
+        refreshDrawerSelection()
         loadNotes()
     }
 
     override fun onResume() {
         super.onResume()
+        resumeQuickNoteBubble()
         refreshFolders()
         loadNotes()
+    }
+
+    /** The bubble is a foreground service, so bring it back whenever the app is opened. */
+    private fun resumeQuickNoteBubble() {
+        if (!QuickNotePrefs.isEnabled(this) || !QuickNotePrefs.canDrawOverlays(this)) return
+        ContextCompat.startForegroundService(this, Intent(this, ChatHeadService::class.java))
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
@@ -157,18 +175,81 @@ class MainActivity : AppCompatActivity() {
             .getOrDefault(NoteSort.UPDATED)
         filter = NoteFilter(
             colors = state.getStringArrayList(STATE_COLORS).orEmpty()
-                .map { com.example.mobprog.model.NoteColor.fromKey(it) }
+                .map { NoteColor.fromKey(it) }
                 .toSet(),
             priorities = state.getIntegerArrayList(STATE_PRIORITIES).orEmpty()
-                .map { com.example.mobprog.model.Priority.fromValue(it) }
+                .map { Priority.fromValue(it) }
                 .toSet(),
             hasDeadline = state.getBoolean(STATE_DEADLINE, false),
             status = runCatching {
-                com.example.mobprog.model.StatusFilter.valueOf(state.getString(STATE_STATUS) ?: "")
-            }.getOrDefault(com.example.mobprog.model.StatusFilter.ANY)
+                StatusFilter.valueOf(state.getString(STATE_STATUS) ?: "")
+            }.getOrDefault(StatusFilter.ANY)
         )
         listMode = state.getBoolean(STATE_LIST_MODE, false)
     }
+
+    private fun setupAppBar() {
+        binding.navMenu.setOnClickListener {
+            binding.drawerRoot.openDrawer(GravityCompat.START)
+        }
+        binding.addNote.setOnClickListener { openEditor(-1L, defaultFolderId()) }
+        binding.toggleView.setOnClickListener {
+            listMode = !listMode
+            applyLayoutMode()
+        }
+        binding.toggleTheme.setOnClickListener { toggleTheme() }
+        binding.chipFilter.setOnClickListener {
+            FilterSheet.newInstance(currentQuery()).show(supportFragmentManager, "filter")
+        }
+        binding.chipEmptyTrash.setOnClickListener { confirmEmptyTrash() }
+
+        binding.quickChips.setOnCheckedStateChangeListener { _, checkedIds ->
+            if (suppressQuickChips) return@setOnCheckedStateChangeListener
+            val id = checkedIds.firstOrNull() ?: return@setOnCheckedStateChangeListener
+            filter = when (id) {
+                R.id.chip_due -> filter.copy(hasDeadline = true, status = StatusFilter.OPEN)
+                R.id.chip_open -> filter.copy(hasDeadline = false, status = StatusFilter.OPEN)
+                else -> filter.copy(hasDeadline = false, status = StatusFilter.ANY)
+            }
+            updateFilterIndicator()
+            loadNotes()
+        }
+
+        binding.searchInput.doAfterTextChanged { text ->
+            searchQuery = text?.toString().orEmpty()
+            binding.searchClear.isVisible = searchQuery.isNotEmpty()
+            reloadSoon()
+        }
+        binding.searchClear.setOnClickListener { binding.searchInput.setText("") }
+        if (searchQuery.isNotEmpty()) {
+            binding.searchInput.setText(searchQuery)
+            binding.searchInput.setSelection(searchQuery.length)
+        }
+        binding.screenTitle.text = titleForCurrentView()
+        updateThemeButton()
+    }
+
+    private fun toggleTheme() {
+        ThemePrefs.setMode(
+            this,
+            if (isNightMode()) ThemePrefs.LIGHT else ThemePrefs.DARK
+        )
+    }
+
+    /** Shows the mode the button switches to: a moon while light, a sun while dark. */
+    private fun updateThemeButton() {
+        val night = isNightMode()
+        binding.toggleTheme.setImageResource(
+            if (night) R.drawable.ic_theme_light else R.drawable.ic_theme_dark
+        )
+        binding.toggleTheme.contentDescription = getString(
+            if (night) R.string.cd_theme_light else R.string.cd_theme_dark
+        )
+    }
+
+    private fun isNightMode(): Boolean =
+        (resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK) ==
+            Configuration.UI_MODE_NIGHT_YES
 
     private fun setupList() {
         adapter = NotesAdapter(object : NotesAdapter.Callbacks {
@@ -196,63 +277,9 @@ class MainActivity : AppCompatActivity() {
             val columns = if (resources.configuration.screenWidthDp >= 600) 3 else 2
             StaggeredGridLayoutManager(columns, StaggeredGridLayoutManager.VERTICAL)
         }
-        val item = binding.toolbar.menu.findItem(R.id.action_toggle_view)
-        item?.setIcon(if (listMode) R.drawable.ic_grid else R.drawable.ic_list)
-        item?.setTitle(if (listMode) R.string.action_grid else R.string.action_list)
-    }
-
-    private fun setupToolbar() {
-        binding.toolbar.setNavigationOnClickListener {
-            binding.drawerRoot.openDrawer(GravityCompat.START)
-        }
-
-        val searchItem = binding.toolbar.menu.findItem(R.id.action_search)
-        val searchView = searchItem.actionView as SearchView
-        searchView.queryHint = getString(R.string.action_search)
-        searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
-            override fun onQueryTextSubmit(query: String?): Boolean = false
-            override fun onQueryTextChange(newText: String?): Boolean {
-                searchQuery = newText.orEmpty()
-                reloadSoon()
-                return true
-            }
-        })
-        searchItem.setOnActionExpandListener(object : MenuItem.OnActionExpandListener {
-            override fun onMenuItemActionExpand(item: MenuItem): Boolean = true
-            override fun onMenuItemActionCollapse(item: MenuItem): Boolean {
-                searchQuery = ""
-                loadNotes()
-                return true
-            }
-        })
-        if (searchQuery.isNotBlank()) {
-            searchItem.expandActionView()
-            searchView.setQuery(searchQuery, false)
-        }
-
-        binding.toolbar.setOnMenuItemClickListener { item ->
-            when (item.itemId) {
-                R.id.action_add_note -> {
-                    openEditor(-1L, defaultFolderId())
-                    true
-                }
-                R.id.action_filter -> {
-                    FilterSheet.newInstance(currentQuery()).show(supportFragmentManager, "filter")
-                    true
-                }
-                R.id.action_toggle_view -> {
-                    listMode = !listMode
-                    applyLayoutMode()
-                    true
-                }
-                R.id.action_empty_trash -> {
-                    confirmEmptyTrash()
-                    true
-                }
-                else -> false
-            }
-        }
-        updateFilterIndicator()
+        binding.toggleView.setImageResource(if (listMode) R.drawable.ic_grid else R.drawable.ic_list)
+        binding.toggleView.contentDescription =
+            getString(if (listMode) R.string.action_grid else R.string.action_list)
     }
 
     private fun setupDrawer() {
@@ -293,6 +320,7 @@ class MainActivity : AppCompatActivity() {
             sort = runCatching { NoteSort.valueOf(bundle.getString(FilterSheet.ARG_SORT) ?: "") }
                 .getOrDefault(NoteSort.UPDATED)
             filter = FilterSheet.filterFrom(bundle)
+            syncQuickChips()
             updateFilterIndicator()
             loadNotes()
         }
@@ -344,9 +372,8 @@ class MainActivity : AppCompatActivity() {
             notes
         }
         adapter.submitList(ordered) { updateEmptyState(ordered) }
-        binding.toolbar.title = titleForCurrentView()
-        binding.toolbar.menu.findItem(R.id.action_empty_trash)?.isVisible =
-            currentView == NoteView.TRASH
+        binding.screenTitle.text = titleForCurrentView()
+        binding.chipEmptyTrash.isVisible = currentView == NoteView.TRASH
     }
 
     private fun refreshFolders() {
@@ -365,7 +392,7 @@ class MainActivity : AppCompatActivity() {
                 folderMenuIds[itemId] = folder.id
             }
             if (currentView == NoteView.FOLDER && currentFolderId != -1L) {
-                binding.toolbar.title = titleForCurrentView()
+                binding.screenTitle.text = titleForCurrentView()
             }
         }
     }
@@ -373,7 +400,7 @@ class MainActivity : AppCompatActivity() {
     private fun selectView(view: NoteView, folderId: Long) {
         currentView = view
         currentFolderId = folderId
-        binding.toolbar.title = titleForCurrentView()
+        binding.screenTitle.text = titleForCurrentView()
         refreshDrawerSelection()
         updateFilterIndicator()
         loadNotes()
@@ -392,7 +419,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun titleForCurrentView(): String = when (currentView) {
-        NoteView.NOTES -> getString(R.string.nav_notes)
+        NoteView.NOTES -> getString(R.string.app_title)
         NoteView.REMINDERS -> getString(R.string.nav_reminders)
         NoteView.ARCHIVE -> getString(R.string.nav_archive)
         NoteView.TRASH -> getString(R.string.nav_trash)
@@ -453,24 +480,48 @@ class MainActivity : AppCompatActivity() {
 
     private fun clearFiltersAndSearch() {
         filter = NoteFilter()
+        binding.searchInput.setText("")
         searchQuery = ""
-        binding.toolbar.menu.findItem(R.id.action_search)?.collapseActionView()
+        syncQuickChips()
         updateFilterIndicator()
         loadNotes()
     }
 
+    private fun syncQuickChips() {
+        suppressQuickChips = true
+        val chip = when {
+            filter.hasDeadline && filter.status == StatusFilter.OPEN -> R.id.chip_due
+            filter.status == StatusFilter.OPEN -> R.id.chip_open
+            else -> R.id.chip_all
+        }
+        binding.quickChips.check(chip)
+        suppressQuickChips = false
+    }
+
     private fun updateFilterIndicator() {
-        val item = binding.toolbar.menu.findItem(R.id.action_filter) ?: return
-        val color = ContextCompat.getColor(
+        val active = filter.hasCustomFilter
+        val iconColor = ContextCompat.getColor(
             this,
-            if (filter.isActive) R.color.color_primary else R.color.icon_tint
+            if (active) R.color.color_primary else R.color.color_on_surface_variant
         )
-        item.icon?.mutate()?.setTint(color)
-        item.title = if (filter.isActive) {
+        binding.chipFilter.chipIconTint = ColorStateList.valueOf(iconColor)
+        binding.chipFilter.text = if (active) {
             getString(R.string.filter_active)
         } else {
             getString(R.string.action_filter)
         }
+        binding.chipFilter.chipBackgroundColor = ColorStateList.valueOf(
+            ContextCompat.getColor(
+                this,
+                if (active) R.color.color_primary_container else R.color.pill_background
+            )
+        )
+        binding.chipFilter.setTextColor(
+            ContextCompat.getColor(
+                this,
+                if (active) R.color.color_on_primary_container else R.color.color_on_surface_variant
+            )
+        )
     }
 
     // endregion

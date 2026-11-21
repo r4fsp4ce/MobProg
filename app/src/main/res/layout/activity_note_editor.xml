@@ -10,9 +10,10 @@
         android:id="@+id/toolbar"
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
+        android:paddingStart="@dimen/space_xs"
+        android:paddingEnd="@dimen/space_xs"
         app:navigationContentDescription="@string/cd_back"
-        app:navigationIcon="@drawable/ic_close"
-        app:title="@string/editor_new_note" />
+        app:navigationIcon="@drawable/ic_close" />
 
     <androidx.core.widget.NestedScrollView
         android:id="@+id/editor_scroll"
@@ -25,9 +26,9 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:paddingStart="@dimen/space_l"
-            android:paddingTop="@dimen/space_s"
-            android:paddingEnd="@dimen/space_l"
+            android:paddingStart="@dimen/screen_padding"
+            android:paddingTop="@dimen/space_xxs"
+            android:paddingEnd="@dimen/screen_padding"
             android:paddingBottom="@dimen/space_xl">
 
             <TextView
@@ -38,38 +39,37 @@
                 android:background="@drawable/bg_pill"
                 android:clickable="true"
                 android:drawableStart="@drawable/ic_folder"
-                android:drawableEnd="@drawable/ic_chevron_right"
                 android:drawablePadding="@dimen/space_xs"
                 android:focusable="true"
                 android:foreground="?attr/selectableItemBackground"
-                android:minHeight="@dimen/touch_target"
+                android:minHeight="32dp"
                 android:paddingStart="@dimen/space_s"
                 android:paddingEnd="@dimen/space_s"
-                android:textColor="?attr/colorOnSurface" />
+                android:textColor="?attr/colorOnSurfaceVariant"
+                android:textSize="11sp" />
 
-            <com.google.android.material.textfield.TextInputLayout
-                android:id="@+id/title_layout"
-                style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
+            <EditText
+                android:id="@+id/title_input"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/space_s"
-                android:hint="@string/editor_title_hint">
-
-                <com.google.android.material.textfield.TextInputEditText
-                    android:id="@+id/title_input"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:imeOptions="actionNext"
-                    android:inputType="textCapSentences|textMultiLine"
-                    android:maxLines="4"
-                    android:textAppearance="?attr/textAppearanceTitleMedium" />
-            </com.google.android.material.textfield.TextInputLayout>
+                android:layout_marginTop="@dimen/space_xs"
+                android:background="@null"
+                android:hint="@string/editor_title_hint"
+                android:imeOptions="actionNext"
+                android:inputType="textCapSentences|textMultiLine"
+                android:letterSpacing="-0.015"
+                android:maxLines="4"
+                android:minHeight="@dimen/touch_target"
+                android:textColor="?attr/colorOnSurface"
+                android:textColorHint="?attr/colorOnSurfaceVariant"
+                android:textSize="22sp"
+                android:textStyle="bold" />
 
             <LinearLayout
                 android:id="@+id/block_container"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/space_m"
+                android:layout_marginTop="@dimen/space_s"
                 android:orientation="vertical" />
 
             <TextView
@@ -77,8 +77,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/space_s"
-                android:textAppearance="?attr/textAppearanceBodySmall"
                 android:textColor="?attr/colorError"
+                android:textSize="12sp"
                 android:visibility="gone" />
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>
@@ -86,5 +86,8 @@
     <com.example.mobprog.ui.RibbonView
         android:id="@+id/ribbon"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/ribbon_margin"
+        android:layout_marginEnd="@dimen/ribbon_margin"
+        android:layout_marginBottom="@dimen/ribbon_margin" />
 </LinearLayout>

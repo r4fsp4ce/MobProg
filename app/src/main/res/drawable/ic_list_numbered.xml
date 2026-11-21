@@ -1,22 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!--
+  Material Symbols "format_list_numbered" (outlined), Google.
+  Source: https://fonts.google.com/icons — Apache License 2.0.
+  The original artwork uses a viewBox of 0 -960 960 960; the group translates
+  it into Android's non-negative viewport.
+-->
 <vector xmlns:android="http://schemas.android.com/apk/res/android"
     android:width="24dp"
     android:height="24dp"
-    android:viewportWidth="24"
-    android:viewportHeight="24">
-    <path
-        android:fillColor="@color/icon_tint"
-        android:pathData="M2.6,5.2h1.2v3.4H2.6zM2.2,8.6h2v1H2.2z" />
-    <path
-        android:fillColor="@color/icon_tint"
-        android:pathData="M2.2,10.6h2.2v1h-1v2.4h-1.2z" />
-    <path
-        android:fillColor="@color/icon_tint"
-        android:pathData="M2.2,16.6h2.2v1h-2.2zM2.2,18.2h2.2v1h-2.2z" />
-    <path
-        android:fillColor="@android:color/transparent"
-        android:pathData="M8.5,6.9h12M8.5,12.3h12M8.5,17.7h12"
-        android:strokeColor="@color/icon_tint"
-        android:strokeLineCap="round"
-        android:strokeWidth="1.7" />
+    android:viewportWidth="960"
+    android:viewportHeight="960">
+    <group android:translateY="960">
+        <path
+            android:fillColor="@color/icon_tint"
+            android:pathData="M120,-80v-60h100v-30h-60v-60h60v-30H120v-60h120q17,0 28.5,11.5T280,-280v40q0,17 -11.5,28.5T240,-200q17,0 28.5,11.5T280,-160v40q0,17 -11.5,28.5T240,-80H120Zm0,-280v-110q0,-17 11.5,-28.5T160,-510h60v-30H120v-60h120q17,0 28.5,11.5T280,-560v70q0,17 -11.5,28.5T240,-450h-60v30h100v60H120Zm60,-280v-180h-60v-60h120v240h-60Zm180,440v-80h480v80H360Zm0,-240v-80h480v80H360Zm0,-240v-80h480v80H360Z" />
+    </group>
 </vector>

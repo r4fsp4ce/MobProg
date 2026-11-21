@@ -33,7 +33,12 @@ enum class Priority(val value: Int, @StringRes val labelRes: Int) {
     HIGH(2, R.string.priority_2),
     MEDIUM(3, R.string.priority_3);
 
-    val badge: String get() = if (this == NONE) "" else "P$value"
+    val badge: String get() = when (this) {
+        NONE -> ""
+        HIGHEST -> "H"
+        HIGH -> "M"
+        MEDIUM -> "L"
+    }
 
     companion object {
         fun fromValue(value: Int): Priority = entries.firstOrNull { it.value == value } ?: NONE

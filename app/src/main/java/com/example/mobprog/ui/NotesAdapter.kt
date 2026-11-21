@@ -46,11 +46,11 @@ class NotesAdapter(private val callbacks: Callbacks) :
             note.openCheckboxes.forEach { line ->
                 val row = TextView(context).apply {
                     text = context.getString(R.string.card_checkbox_open, line)
-                    textSize = 14f
+                    textSize = 11f
                     maxLines = 1
                     ellipsize = TextUtils.TruncateAt.END
                     setTextColor(ContextCompat.getColor(context, R.color.color_on_surface))
-                    val pad = dp(2)
+                    val pad = dp(1)
                     setPadding(0, pad, 0, pad)
                 }
                 binding.cardChecklist.addView(row)
@@ -93,9 +93,9 @@ class NotesAdapter(private val callbacks: Callbacks) :
             binding.cardDeadline.isVisible = deadline != null
             if (deadline != null) {
                 val label = Dates.deadlineLabel(context, deadline, note.nextDeadlineAllDay)
-                binding.cardDeadline.text = "$label · ${Dates.countdown(context, deadline)}"
-                binding.cardDeadline.setCompoundDrawablesRelativeWithIntrinsicBounds(R.drawable.ic_clock, 0, 0, 0)
-                binding.cardDeadline.compoundDrawablePadding = dp(4)
+                binding.cardDeadline.text = label
+                binding.cardDeadline.setCompoundDrawablesRelativeWithIntrinsicBounds(R.drawable.ic_clock_small, 0, 0, 0)
+                binding.cardDeadline.compoundDrawablePadding = dp(3)
                 binding.cardDeadline.setTextColor(
                     ContextCompat.getColor(
                         context,
