@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Keeps the 169x179 logo's aspect ratio inside the square adaptive-icon bounds.
+    The ~2.79% side insets make the content 169:179, and the strips show the
+    #030303 background layer, which matches the image's own background.
+    Delete this wrapper if tudow_logo.png is ever replaced with a square export.
+-->
+<inset xmlns:android="http://schemas.android.com/apk/res/android"
+    android:drawable="@drawable/tudow_logo"
+    android:insetLeft="2.79%"
+    android:insetRight="2.79%" />
