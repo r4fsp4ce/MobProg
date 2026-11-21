@@ -1,3 +1,4 @@
+
 package com.example.mobprog
 
 import android.app.Activity
@@ -5,6 +6,7 @@ import android.app.Application
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
+import com.example.mobprog.data.SQLiteTodoStore
 import com.example.mobprog.data.StoreProvider
 import com.example.mobprog.notify.Notifications
 import com.example.mobprog.service.ChatHeadService
@@ -24,7 +26,7 @@ class TudowApp : Application() {
         ThemePrefs.apply(this)
         Notifications.ensureChannels(this)
         // The SQLite layer plugs in here once it exists:
-        // StoreProvider.install(SQLiteTodoStore(this))
+        StoreProvider.install(SQLiteTodoStore(this))
         StoreProvider.get()
 
         // The bubble is for other apps: hide it while any of ours is on screen.

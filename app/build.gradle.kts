@@ -1,22 +1,24 @@
+
 plugins {
     alias(libs.plugins.android.application)
 }
 
 android {
     namespace = "com.example.mobprog"
+
     compileSdk {
         version = release(37)
     }
 
     defaultConfig {
         applicationId = "com.example.mobprog"
-        // ARCHITECTURE.md: minSdk 26
         minSdk = 26
         targetSdk = 37
         versionCode = 1
         versionName = "1.0"
 
-        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        testInstrumentationRunner =
+            "androidx.test.runner.AndroidJUnitRunner"
     }
 
     buildFeatures {
@@ -30,6 +32,7 @@ android {
             }
         }
     }
+
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
@@ -44,7 +47,12 @@ dependencies {
     implementation(libs.material)
     implementation(libs.recyclerview)
     implementation(libs.markwon.core)
+
     testImplementation(libs.junit)
+
     androidTestImplementation(libs.espresso.core)
     androidTestImplementation(libs.ext.junit)
+
+    // Automatically grant notification permissions in tests
+    androidTestImplementation("androidx.test:rules:1.6.1")
 }
