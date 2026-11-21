@@ -64,6 +64,13 @@ class NotificationTest {
         }
     }
 
+    private fun hasTestNotification(): Boolean =
+        manager.activeNotifications.any {
+            it.notification.extras.getString(
+                "android.title"
+            ) == testTitle
+        }
+
     // TEST 1: DEADLINE NOTIFICATION CHANNEL
 
     @Test
@@ -124,13 +131,7 @@ class NotificationTest {
         var found = false
 
         repeat(10) {
-            if (
-                manager.activeNotifications.any {
-                    it.notification.extras.getString(
-                        "android.title"
-                    ) == testTitle
-                }
-            ) {
+            if (hasTestNotification()) {
                 found = true
             }
 
@@ -140,7 +141,7 @@ class NotificationTest {
         }
 
         assertTrue(
-            "Deadline notification should be posted",
+            "Direct deadline notification was not posted",
             found
         )
     }
@@ -149,6 +150,31 @@ class NotificationTest {
 
     @Test
     fun fallbackAlarmCanBeRegistered() {
+        val deadline =
+            System.currentTimeMillis() + 31 * 60_000L
+
+        val entry = createTestEntry(deadline)
+
+        AlarmScheduler.syncEntry(
+            context,
+            testNoteId,
+            entry,
+            testTitle
+        )
+
+        // This only verifies no scheduling exception.
+        // It does not prove actual delivery.
+    }
+
+    // TEST 6: ACTUAL SCHEDULED NOTIFICATION DELIVERY
+
+    @Test
+    fun actualScheduledNotificationArrives() {
+        assertTrue(
+            "Notification permission must be granted",
+            Notifications.canPost(context)
+        )
+
         val alarmManager = context.getSystemService(
             Context.ALARM_SERVICE
         ) as AlarmManager
@@ -157,20 +183,25 @@ class NotificationTest {
             Build.VERSION.SDK_INT < Build.VERSION_CODES.S ||
                     alarmManager.canScheduleExactAlarms()
 
+        // The 30-minute offset should trigger
+        // approximately 20 seconds from now.
         val deadline =
-            System.currentTimeMillis() + 31 * 60_000L
+            System.currentTimeMillis() +
+                    30 * 60_000L +
+                    20_000L
 
-        val entry = Entry(
-            id = testEntryId,
-            blockId = 1L,
-            position = 0,
-            type = EntryType.CHECKBOX,
-            text = "Fallback alarm test",
-            checked = false,
-            priority = Priority.HIGHEST,
-            deadlineAt = deadline,
-            allDay = false
-        )
+        val entry = createTestEntry(deadline)
+
+        // Remove any old notification with this title.
+        manager.activeNotifications.forEach {
+            if (
+                it.notification.extras.getString(
+                    "android.title"
+                ) == testTitle
+            ) {
+                manager.cancel(it.id)
+            }
+        }
 
         AlarmScheduler.syncEntry(
             context,
@@ -181,11 +212,43 @@ class NotificationTest {
 
         android.util.Log.i(
             "NotificationTest",
-            "Scheduling completed; exact alarm access: $exactAllowed"
+            "Scheduled alarm; exact access: $exactAllowed"
         )
 
-        // Smoke test only: reaching here confirms that
-        // scheduling did not throw an exception.
-        // It does not prove registration or delivery.
+        var delivered = false
+
+        // Wait up to 3 minutes for actual delivery.
+        val timeout =
+            System.currentTimeMillis() + 180_000L
+
+        while (System.currentTimeMillis() < timeout) {
+            if (hasTestNotification()) {
+                delivered = true
+                break
+            }
+
+            Thread.sleep(1000)
+        }
+
+        assertTrue(
+            "No scheduled notification received within 3 minutes. " +
+                    "Android may delay inexact alarms.",
+            delivered
+        )
     }
+
+    private fun createTestEntry(
+        deadline: Long
+    ): Entry =
+        Entry(
+            id = testEntryId,
+            blockId = 1L,
+            position = 0,
+            type = EntryType.CHECKBOX,
+            text = "Scheduled notification test",
+            checked = false,
+            priority = Priority.HIGHEST,
+            deadlineAt = deadline,
+            allDay = false
+        )
 }
