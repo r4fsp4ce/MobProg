@@ -1,3 +1,302 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">MobProg</string>
+    <string name="app_name">Tudow</string>
+    <string name="untitled_note">Untitled</string>
+
+    <!-- Drawer -->
+    <string name="nav_notes">Notes</string>
+    <string name="nav_reminders">Reminders</string>
+    <string name="nav_folders">Folders</string>
+    <string name="nav_manage_folders">Manage folders</string>
+    <string name="nav_archive">Archive</string>
+    <string name="nav_trash">Trash</string>
+    <string name="nav_settings">Settings</string>
+    <string name="nav_group_places">Places</string>
+    <string name="drawer_open">Open navigation drawer</string>
+    <string name="drawer_close">Close navigation drawer</string>
+
+    <!-- Actions -->
+    <string name="action_search">Search</string>
+    <string name="action_filter">Filter</string>
+    <string name="action_grid">Switch to grid view</string>
+    <string name="action_list">Switch to list view</string>
+    <string name="action_add_note">New note</string>
+    <string name="action_add_folder">New folder</string>
+    <string name="action_add_item">Add item</string>
+    <string name="action_save">Save</string>
+    <string name="action_cancel">Cancel</string>
+    <string name="action_delete">Delete</string>
+    <string name="action_rename">Rename</string>
+    <string name="action_move">Move to folder</string>
+    <string name="action_pin">Pin</string>
+    <string name="action_unpin">Unpin</string>
+    <string name="action_archive">Archive</string>
+    <string name="action_unarchive">Unarchive</string>
+    <string name="action_restore">Restore</string>
+    <string name="action_empty_trash">Empty trash</string>
+    <string name="action_more">More options</string>
+    <string name="action_undo">Undo</string>
+    <string name="action_redo">Redo</string>
+    <string name="action_apply">Apply</string>
+    <string name="action_clear_filters">Clear filters</string>
+    <string name="action_close">Close</string>
+    <string name="action_ok">OK</string>
+    <string name="action_confirm">Confirm</string>
+    <string name="action_change_folder">Change folder</string>
+    <string name="action_discard">Discard</string>
+    <string name="action_save_note">Save note</string>
+    <string name="action_remove_deadline">Remove deadline</string>
+
+    <!-- Content descriptions -->
+    <string name="cd_logo">Tudow logo</string>
+    <string name="cd_open_drawer">Open navigation drawer</string>
+    <string name="cd_search">Search notes</string>
+    <string name="cd_filter">Filter and sort</string>
+    <string name="cd_add_note">New note</string>
+    <string name="cd_toggle_view">Toggle grid or list view</string>
+    <string name="cd_more_actions">More options for %1$s</string>
+    <string name="cd_pin">Pin note</string>
+    <string name="cd_clock">Set deadline</string>
+    <string name="cd_priority">Set priority</string>
+    <string name="cd_color">Set note colour</string>
+    <string name="cd_undo">Undo</string>
+    <string name="cd_redo">Redo</string>
+    <string name="cd_discard">Discard changes</string>
+    <string name="cd_save">Save note</string>
+    <string name="cd_delete_block">Delete block</string>
+    <string name="cd_block_up">Move block up</string>
+    <string name="cd_block_down">Move block down</string>
+    <string name="cd_add_entry">Add list item</string>
+    <string name="cd_back">Back</string>
+    <string name="cd_folder">Folder</string>
+    <string name="cd_checked">Done</string>
+    <string name="cd_unchecked">Not done</string>
+    <string name="cd_quick_note">Open quick note</string>
+    <string name="cd_close">Close</string>
+    <string name="cd_previous_month">Previous month</string>
+    <string name="cd_next_month">Next month</string>
+
+    <!-- Sort -->
+    <string name="sort_by">Sort by</string>
+    <string name="sort_updated">Last edited</string>
+    <string name="sort_created">Date created</string>
+    <string name="sort_deadline">Deadline</string>
+    <string name="sort_priority">Priority</string>
+    <string name="sort_title">Title</string>
+
+    <!-- Filter sheet -->
+    <string name="filter_title">Filter and sort</string>
+    <string name="filter_colors">Colour</string>
+    <string name="filter_priority">Priority</string>
+    <string name="filter_has_deadline">With a deadline</string>
+    <string name="filter_status">Items</string>
+    <string name="filter_status_any">Any</string>
+    <string name="filter_status_open">Open only</string>
+    <string name="filter_status_done">Done only</string>
+    <string name="filter_active">Filters are active</string>
+
+    <!-- Colours -->
+    <string name="color_default">Default</string>
+    <string name="color_red">Red</string>
+    <string name="color_orange">Orange</string>
+    <string name="color_yellow">Yellow</string>
+    <string name="color_green">Green</string>
+    <string name="color_teal">Teal</string>
+    <string name="color_blue">Blue</string>
+    <string name="color_indigo">Indigo</string>
+    <string name="color_purple">Purple</string>
+    <string name="color_pink">Pink</string>
+    <string name="color_brown">Brown</string>
+    <string name="color_gray">Grey</string>
+    <string name="color_label">Colour: %1$s</string>
+
+    <!-- Priorities -->
+    <string name="priority_none">No priority</string>
+    <string name="priority_1">P1 · Highest</string>
+    <string name="priority_2">P2 · High</string>
+    <string name="priority_3">P3 · Medium</string>
+    <string name="priority_badge">P%1$d</string>
+    <string name="priority_label">Priority %1$s</string>
+
+    <!-- Entry types -->
+    <string name="type_text">Text</string>
+    <string name="type_bullet">Bulleted list</string>
+    <string name="type_numbered">Numbered list</string>
+    <string name="type_checkbox">Checklist</string>
+    <string name="list_type_label">List type: %1$s</string>
+
+    <!-- Editor -->
+    <string name="editor_new_note">New note</string>
+    <string name="editor_title_hint">Title</string>
+    <string name="editor_heading_hint">Heading (optional)</string>
+    <string name="editor_item_hint">List item</string>
+    <string name="editor_blank_note_hint">Write something…</string>
+    <string name="editor_error_empty">Add a title or at least one item.</string>
+    <string name="editor_error_no_item">Select a list item first.</string>
+    <string name="editor_block_number">Block %1$d</string>
+    <string name="editor_delete_block_title">Delete this block?</string>
+    <string name="editor_delete_block_message">Its items will be deleted too.</string>
+    <string name="editor_discard_title">Discard changes?</string>
+    <string name="editor_discard_message">Your edits to this note will be lost.</string>
+    <string name="editor_deadline_set">Deadline set</string>
+    <string name="editor_deadline_removed">Deadline removed</string>
+    <string name="editor_note_deleted">Note deleted</string>
+
+    <!-- Cards -->
+    <string name="card_progress">%1$d/%2$d</string>
+    <string name="card_progress_description">%1$d of %2$d items done</string>
+    <string name="card_checkbox_open">☐ %1$s</string>
+    <string name="card_pin_description">Pinned</string>
+    <string name="card_pin">Pin note</string>
+    <string name="card_unpin">Unpin note</string>
+    <string name="card_folder_description">In folder %1$s</string>
+
+    <plurals name="completed_count">
+        <item quantity="one">%d completed</item>
+        <item quantity="other">%d completed</item>
+    </plurals>
+
+    <!-- Deadlines -->
+    <string name="deadline_today">Today, %1$s</string>
+    <string name="deadline_today_all_day">Today</string>
+    <string name="deadline_tomorrow">Tomorrow, %1$s</string>
+    <string name="deadline_tomorrow_all_day">Tomorrow</string>
+    <string name="deadline_date">%1$s</string>
+    <string name="deadline_date_time">%1$s, %2$s</string>
+    <string name="deadline_all_day">All day</string>
+    <string name="deadline_chip_description">Deadline %1$s</string>
+    <string name="countdown_overdue">Overdue</string>
+    <string name="countdown_now">Due now</string>
+    <string name="countdown_minutes">in %1$d min</string>
+    <string name="countdown_hours">in %1$d h</string>
+    <string name="countdown_days">in %1$d d</string>
+
+    <!-- Empty states -->
+    <string name="empty_notes_title">No notes yet.</string>
+    <string name="empty_notes_body">Tap + to add one.</string>
+    <string name="empty_search_title">No results</string>
+    <string name="empty_search_body">Try another search, or clear the filters.</string>
+    <string name="empty_folder_title">This folder is empty</string>
+    <string name="empty_folder_body">Tap + to add a note here.</string>
+    <string name="empty_trash_title">Trash is empty</string>
+    <string name="empty_trash_body">Deleted notes appear here.</string>
+    <string name="empty_reminders_title">No reminders</string>
+    <string name="empty_reminders_body">Give an item a deadline and it shows up here.</string>
+    <string name="empty_archive_title">Nothing archived</string>
+    <string name="empty_archive_body">Archived notes stay out of the way here.</string>
+    <string name="empty_illustration_description">An open document with a pen</string>
+
+    <!-- Messages -->
+    <string name="msg_note_saved">Note saved</string>
+    <string name="msg_note_deleted">Note deleted</string>
+    <string name="msg_note_moved">Note moved</string>
+    <string name="msg_notes_combined">Notes combined</string>
+    <string name="msg_note_restored">Note restored</string>
+    <string name="msg_note_archived">Note archived</string>
+    <string name="msg_note_unarchived">Note restored from archive</string>
+    <string name="msg_note_pinned">Note pinned</string>
+    <string name="msg_note_unpinned">Note unpinned</string>
+    <string name="msg_folder_created">Folder created</string>
+    <string name="msg_folder_renamed">Folder renamed</string>
+    <string name="msg_folder_deleted">Folder deleted</string>
+    <string name="msg_trash_emptied">Trash emptied</string>
+    <string name="msg_could_not_save">Could not save note</string>
+    <string name="msg_permission_denied">Permission denied</string>
+    <string name="msg_overlay_denied">Overlay permission was not granted, so the quick-note bubble stays off.</string>
+    <string name="msg_deadline_in_past">A deadline cannot be in the past.</string>
+    <string name="msg_time_format">Time must be in HH:mm format.</string>
+    <string name="msg_discarded">Changes discarded</string>
+
+    <!-- Dialogs -->
+    <string name="dialog_delete_note_title">Delete note?</string>
+    <string name="dialog_delete_note_message">\"%1$s\" will be moved to Trash.</string>
+    <string name="dialog_delete_note_message_untitled">This note will be moved to Trash.</string>
+    <string name="dialog_delete_forever_title">Delete forever?</string>
+    <string name="dialog_delete_forever_message">This note cannot be recovered.</string>
+    <string name="dialog_empty_trash_title">Empty trash?</string>
+    <string name="dialog_empty_trash_message">Every note in the trash will be deleted forever.</string>
+    <string name="dialog_append_title">Append note?</string>
+    <string name="dialog_append_message">Append \"%1$s\" to \"%2$s\"?</string>
+    <string name="dialog_append_confirm">Append</string>
+    <string name="dialog_delete_folder_title">Delete folder?</string>
+    <string name="dialog_delete_folder_message">Notes in \"%1$s\" will move to Inbox.</string>
+    <string name="dialog_folder_name_hint">Folder name</string>
+    <string name="dialog_new_folder">New folder</string>
+    <string name="dialog_rename_folder">Rename folder</string>
+    <string name="error_folder_name_required">Folder name is required.</string>
+    <string name="error_folder_name_duplicate">A folder with that name already exists.</string>
+    <string name="inbox_name">Inbox</string>
+    <string name="folders_inbox_locked">The Inbox folder cannot be deleted.</string>
+
+    <!-- Settings -->
+    <string name="settings_title">Settings</string>
+    <string name="settings_group_quick_note">Quick note</string>
+    <string name="settings_quick_note_toggle">Enable quick note bubble</string>
+    <string name="settings_quick_note_summary">A floating bubble lets you write a note from any app.</string>
+    <string name="settings_overlay_explain_title">Display over other apps</string>
+    <string name="settings_overlay_explain_message">To keep the bubble visible above other apps, Tudow needs the \"Display over other apps\" permission. The next screen lets you grant it.</string>
+    <string name="settings_overlay_denied_message">Without this permission the bubble cannot be shown, so the feature stays off.</string>
+    <string name="settings_open_system_settings">Open system settings</string>
+    <string name="settings_group_notifications">Reminders</string>
+    <string name="settings_notifications_summary">Reminders arrive 1 day, 2 hours, 1 hour and 30 minutes before a deadline.</string>
+    <string name="settings_notification_allowed">Notifications are allowed</string>
+    <string name="settings_notification_denied">Notifications are blocked</string>
+    <string name="settings_notification_grant">Allow notifications</string>
+    <string name="settings_exact_alarm">Exact alarms</string>
+    <string name="settings_exact_alarm_allowed">Allowed — reminders arrive on time</string>
+    <string name="settings_exact_alarm_denied">Not allowed — reminders may arrive late</string>
+    <string name="settings_exact_alarm_grant">Allow exact alarms</string>
+    <string name="settings_group_about">About</string>
+    <string name="settings_markdown_summary">Notes are mirrored as Markdown files in:</string>
+    <string name="settings_version">Version %1$s</string>
+
+    <!-- Quick note -->
+    <string name="quick_note_title">Quick note</string>
+    <string name="quick_note_hint">Add your notes here</string>
+    <string name="quick_note_saved">Note saved</string>
+    <string name="quick_note_empty">Write something first.</string>
+
+    <!-- Deadline dialog -->
+    <string name="deadline_title">Deadline</string>
+    <string name="deadline_month">Month</string>
+    <string name="deadline_year">Year</string>
+    <string name="deadline_time_hint">HH:mm</string>
+    <string name="deadline_all_day_toggle">All day</string>
+    <string name="deadline_day_content_description">%1$s %2$d</string>
+    <string name="deadline_selected_day_description">%1$s, selected</string>
+
+    <!-- Weekdays, Sunday first -->
+    <string name="weekday_su">Su</string>
+    <string name="weekday_mo">Mo</string>
+    <string name="weekday_tu">Tu</string>
+    <string name="weekday_we">We</string>
+    <string name="weekday_th">Th</string>
+    <string name="weekday_fr">Fr</string>
+    <string name="weekday_sa">Sa</string>
+
+    <!-- Notifications -->
+    <string name="notification_channel_deadlines">Deadline reminders</string>
+    <string name="notification_channel_deadlines_description">Reminders for list items with a deadline</string>
+    <string name="notification_channel_quick_note">Quick note bubble</string>
+    <string name="notification_channel_quick_note_description">Keeps the floating quick-note bubble running</string>
+    <string name="notification_title">%1$s</string>
+    <string name="notification_deadline_in">Deadline in %1$s</string>
+    <string name="notification_deadline_due">Deadline reached</string>
+    <string name="notification_all_day">All day</string>
+    <string name="notification_body_fallback">A note has a deadline.</string>
+
+    <!-- Folders -->
+    <string name="folders_title">Folders</string>
+    <string name="folders_pick_title">Choose a folder</string>
+    <string name="folders_empty_title">No folders yet</string>
+    <string name="folders_empty_body">Tap + to create one.</string>
+    <plurals name="folder_note_count">
+        <item quantity="one">%d note</item>
+        <item quantity="other">%d notes</item>
+    </plurals>
+
+    <!-- Service -->
+    <string name="service_channel_name">Quick note bubble</string>
+    <string name="service_notification_title">Quick note bubble is on</string>
+    <string name="service_notification_text">Tap to open Tudow</string>
 </resources>

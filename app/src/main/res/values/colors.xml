@@ -1,5 +1,50 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="black">#FF000000</color>
-    <color name="white">#FFFFFFFF</color>
+    <!-- Material 3 palette, light. -->
+    <color name="color_primary">#4A5AB5</color>
+    <color name="color_on_primary">#FFFFFF</color>
+    <color name="color_primary_container">#E0E0FF</color>
+    <color name="color_on_primary_container">#00105C</color>
+    <color name="color_secondary">#5C5D72</color>
+    <color name="color_on_secondary">#FFFFFF</color>
+    <color name="color_secondary_container">#E1E0F9</color>
+    <color name="color_on_secondary_container">#191A2C</color>
+    <color name="color_tertiary">#78536B</color>
+    <color name="color_surface">#FBF8FF</color>
+    <color name="color_on_surface">#1B1B21</color>
+    <color name="color_surface_variant">#E4E1EC</color>
+    <color name="color_on_surface_variant">#47464F</color>
+    <color name="color_outline">#777680</color>
+    <color name="color_outline_variant">#C8C5D0</color>
+    <color name="color_error">#BA1A1A</color>
+    <color name="color_on_error">#FFFFFF</color>
+    <color name="color_surface_container">#F0EDF7</color>
+    <color name="color_surface_container_high">#EAE7F1</color>
+    <color name="color_surface_container_highest">#E4E1EB</color>
+    <color name="color_window_background">#F5F2FC</color>
+
+    <!-- Icons drawn as vectors pick this up, so they follow day/night. -->
+    <color name="icon_tint">#47464F</color>
+
+    <!-- Note card colours. They are always used together with a name. -->
+    <color name="note_default">#FFFFFF</color>
+    <color name="note_red">#F9D8D6</color>
+    <color name="note_orange">#FBE0C3</color>
+    <color name="note_yellow">#FBF0C4</color>
+    <color name="note_green">#DCEBD3</color>
+    <color name="note_teal">#D2EAE7</color>
+    <color name="note_blue">#D5E3F7</color>
+    <color name="note_indigo">#DDE0F9</color>
+    <color name="note_purple">#E7DAF7</color>
+    <color name="note_pink">#F6DAE8</color>
+    <color name="note_brown">#EBDDD3</color>
+    <color name="note_gray">#E8E8EA</color>
+
+    <!-- Deadline chip states. -->
+    <color name="deadline_normal">#47464F</color>
+    <color name="deadline_soon">#8A5300</color>
+    <color name="deadline_overdue">#BA1A1A</color>
+
+    <color name="ripple">#1F000000</color>
+    <color name="pill_background">#14000000</color>
 </resources>

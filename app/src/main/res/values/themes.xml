@@ -1,9 +1,75 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools">
-    <!-- Base application theme. -->
+
     <style name="Base.Theme.MobProg" parent="Theme.Material3.DayNight.NoActionBar">
-        <!-- Customize your light theme here. -->
-        <!-- <item name="colorPrimary">@color/my_light_primary</item> -->
+        <item name="colorPrimary">@color/color_primary</item>
+        <item name="colorOnPrimary">@color/color_on_primary</item>
+        <item name="colorPrimaryContainer">@color/color_primary_container</item>
+        <item name="colorOnPrimaryContainer">@color/color_on_primary_container</item>
+        <item name="colorSecondary">@color/color_secondary</item>
+        <item name="colorOnSecondary">@color/color_on_secondary</item>
+        <item name="colorSecondaryContainer">@color/color_secondary_container</item>
+        <item name="colorOnSecondaryContainer">@color/color_on_secondary_container</item>
+        <item name="colorTertiary">@color/color_tertiary</item>
+        <item name="colorSurface">@color/color_surface</item>
+        <item name="colorOnSurface">@color/color_on_surface</item>
+        <item name="colorSurfaceVariant">@color/color_surface_variant</item>
+        <item name="colorOnSurfaceVariant">@color/color_on_surface_variant</item>
+        <item name="colorOutline">@color/color_outline</item>
+        <item name="colorOutlineVariant">@color/color_outline_variant</item>
+        <item name="colorError">@color/color_error</item>
+        <item name="colorOnError">@color/color_on_error</item>
+        <item name="colorSurfaceContainer">@color/color_surface_container</item>
+        <item name="colorSurfaceContainerHigh">@color/color_surface_container_high</item>
+        <item name="colorSurfaceContainerHighest">@color/color_surface_container_highest</item>
+        <item name="android:windowBackground">@color/color_window_background</item>
+        <item name="android:colorBackground">@color/color_window_background</item>
+        <item name="materialCardViewStyle">@style/Widget.Tudow.Card</item>
+        <item name="toolbarStyle">@style/Widget.Tudow.Toolbar</item>
     </style>
 
     <style name="Theme.MobProg" parent="Base.Theme.MobProg" />
+
+    <style name="Widget.Tudow.Card" parent="Widget.Material3.CardView.Elevated">
+        <item name="cardCornerRadius">@dimen/card_corner</item>
+        <item name="cardElevation">@dimen/card_elevation</item>
+        <item name="strokeWidth">0dp</item>
+    </style>
+
+    <style name="Widget.Tudow.Toolbar" parent="Widget.Material3.Toolbar">
+        <item name="android:background">@android:color/transparent</item>
+        <item name="titleTextAppearance">@style/TextAppearance.Tudow.ToolbarTitle</item>
+    </style>
+
+    <style name="TextAppearance.Tudow.ToolbarTitle" parent="TextAppearance.Material3.TitleLarge">
+        <item name="android:textStyle">bold</item>
+    </style>
+
+    <!-- Section label in the drawer and filter sheet. -->
+    <style name="TextAppearance.Tudow.Label" parent="TextAppearance.Material3.LabelLarge">
+        <item name="android:textColor">@color/color_on_surface_variant</item>
+    </style>
+
+    <!-- Small pill used for priority and deadline on cards. -->
+    <style name="Widget.Tudow.Pill" parent="Widget.AppCompat.TextView">
+        <item name="android:background">@drawable/bg_pill</item>
+        <item name="android:paddingStart">@dimen/chip_padding_h</item>
+        <item name="android:paddingEnd">@dimen/chip_padding_h</item>
+        <item name="android:paddingTop">@dimen/chip_padding_v</item>
+        <item name="android:paddingBottom">@dimen/chip_padding_v</item>
+        <item name="android:drawablePadding">@dimen/space_xs</item>
+        <item name="android:textSize">12sp</item>
+        <item name="android:gravity">center_vertical</item>
+        <item name="android:maxLines">1</item>
+    </style>
+
+    <style name="Widget.Tudow.RibbonButton" parent="Widget.Material3.Button.IconButton">
+        <item name="android:layout_width">@dimen/touch_target</item>
+        <item name="android:layout_height">@dimen/touch_target</item>
+        <item name="iconTint">@color/color_on_surface_variant</item>
+    </style>
+
+    <style name="Widget.Tudow.Dialog" parent="ThemeOverlay.Material3.MaterialAlertDialog">
+        <item name="alertDialogStyle">@style/MaterialAlertDialog.Material3</item>
+    </style>
 </resources>

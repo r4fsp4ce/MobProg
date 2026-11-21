@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:gravity="center_vertical"
+    android:orientation="horizontal">
+
+    <CheckBox
+        android:id="@+id/entry_checkbox"
+        android:layout_width="wrap_content"
+        android:layout_height="@dimen/touch_target"
+        android:visibility="gone" />
+
+    <TextView
+        android:id="@+id/entry_prefix"
+        android:layout_width="22dp"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:textAppearance="?attr/textAppearanceBodyLarge"
+        android:textColor="?attr/colorOnSurfaceVariant"
+        android:visibility="gone" />
+
+    <EditText
+        android:id="@+id/entry_text"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:background="@null"
+        android:hint="@string/editor_item_hint"
+        android:imeOptions="actionNext"
+        android:inputType="textCapSentences|textMultiLine"
+        android:minHeight="@dimen/touch_target"
+        android:paddingStart="@dimen/space_xs"
+        android:paddingEnd="@dimen/space_xs"
+        android:textAppearance="?attr/textAppearanceBodyLarge"
+        android:textColor="?attr/colorOnSurface"
+        android:textColorHint="?attr/colorOnSurfaceVariant" />
+
+    <TextView
+        android:id="@+id/entry_priority"
+        style="@style/Widget.Tudow.Pill"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/space_xxs"
+        android:textColor="?attr/colorOnSurface"
+        android:visibility="gone" />
+
+    <TextView
+        android:id="@+id/entry_deadline"
+        style="@style/Widget.Tudow.Pill"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/space_xxs"
+        android:clickable="true"
+        android:drawableStart="@drawable/ic_clock"
+        android:drawablePadding="@dimen/space_xxs"
+        android:focusable="true"
+        android:foreground="?attr/selectableItemBackground"
+        android:gravity="center"
+        android:minHeight="@dimen/touch_target"
+        android:textColor="?attr/colorOnSurface"
+        android:visibility="gone" />
+</LinearLayout>

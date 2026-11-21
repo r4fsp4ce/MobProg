@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@drawable/bg_ribbon"
+    android:gravity="center_vertical"
+    android:orientation="horizontal"
+    android:paddingStart="@dimen/space_xs"
+    android:paddingTop="@dimen/space_xs"
+    android:paddingEnd="@dimen/space_xs"
+    android:paddingBottom="@dimen/space_xs">
+
+    <HorizontalScrollView
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:scrollbars="none">
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <ImageButton
+                android:id="@+id/ribbon_list_type"
+                style="@style/Widget.Tudow.RibbonButton"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:src="@drawable/ic_list" />
+
+            <ImageButton
+                android:id="@+id/ribbon_clock"
+                style="@style/Widget.Tudow.RibbonButton"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:contentDescription="@string/cd_clock"
+                android:src="@drawable/ic_clock" />
+
+            <ImageButton
+                android:id="@+id/ribbon_priority"
+                style="@style/Widget.Tudow.RibbonButton"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:contentDescription="@string/cd_priority"
+                android:src="@drawable/ic_flag" />
+
+            <ImageButton
+                android:id="@+id/ribbon_color"
+                style="@style/Widget.Tudow.RibbonButton"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:contentDescription="@string/cd_color"
+                android:src="@drawable/ic_palette" />
+        </LinearLayout>
+    </HorizontalScrollView>
+
+    <View
+        android:layout_width="@dimen/divider"
+        android:layout_height="24dp"
+        android:layout_marginHorizontal="@dimen/space_xxs"
+        android:background="?attr/colorOutlineVariant" />
+
+    <ImageButton
+        android:id="@+id/ribbon_undo"
+        style="@style/Widget.Tudow.RibbonButton"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        android:contentDescription="@string/cd_undo"
+        android:src="@drawable/ic_undo" />
+
+    <ImageButton
+        android:id="@+id/ribbon_redo"
+        style="@style/Widget.Tudow.RibbonButton"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        android:contentDescription="@string/cd_redo"
+        android:src="@drawable/ic_redo" />
+
+    <ImageButton
+        android:id="@+id/ribbon_discard"
+        style="@style/Widget.Tudow.RibbonButton"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        android:contentDescription="@string/cd_discard"
+        android:src="@drawable/ic_close" />
+
+    <ImageButton
+        android:id="@+id/ribbon_save"
+        style="@style/Widget.Tudow.RibbonButton"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        android:contentDescription="@string/cd_save"
+        android:src="@drawable/ic_check" />
+</LinearLayout>
