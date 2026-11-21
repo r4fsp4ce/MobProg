@@ -433,7 +433,8 @@ class SQLiteTodoStoreTest {
             original.copy(blocks = listOf(updatedBlock))
         )
 
-        val entryId = store.note(id)!!.allEntries().first().id
+        val entryId = store.note(id)!!
+            .allEntries().first().id
 
         store.markChecked(entryId, true)
 
@@ -558,5 +559,142 @@ class SQLiteTodoStoreTest {
 
         assertEquals(originalEntryId, restoredEntry.id)
         assertEquals(deadline, restoredEntry.deadlineAt)
+    }
+
+    // TEST 26: UNDO PRESERVES TARGET EDITS
+
+    @Test
+    fun undoMergePreservesTargetEdits() {
+        val sourceId = store.saveNote(
+            sampleNote("Source Note")
+        )
+        val targetId = store.saveNote(
+            sampleNote("Target Note")
+        )
+
+        val token = store.appendNotes(sourceId, targetId)
+        assertNotNull(token)
+
+        val merged = store.note(targetId)!!
+        val targetBlock = merged.blocks.first {
+            it.block.originNoteId == null
+        }
+
+        val editedBlocks = merged.blocks.map { block ->
+            if (block.block.id == targetBlock.block.id) {
+                block.copy(
+                    entries = block.entries.map { entry ->
+                        entry.copy(text = "Edited after merge")
+                    }
+                )
+            } else {
+                block
+            }
+        }
+
+        store.saveNote(
+            merged.copy(blocks = editedBlocks)
+        )
+
+        assertTrue(store.undoAppend(token!!))
+
+        val restoredTarget = store.note(targetId)!!
+
+        assertEquals("Target Note", restoredTarget.note.title)
+        assertTrue(
+            restoredTarget.allEntries().any {
+                it.text == "Edited after merge"
+            }
+        )
+
+        assertNotNull(store.note(sourceId))
+    }
+
+    // TEST 27: MARKDOWN MOVES AFTER FOLDER RENAME
+
+    @Test
+    fun markdownMovesAfterFolderRename() {
+        val folder = store.createFolder("School")
+                as FolderNameResult.Created
+
+        val detail = sampleNote("School Note")
+        val noteId = store.saveNote(
+            detail.copy(
+                note = detail.note.copy(
+                    folderId = folder.folder.id
+                )
+            )
+        )
+
+        val base = context.getExternalFilesDir("notes")!!
+        val oldFile = File(
+            File(base, "School"),
+            "$noteId.md"
+        )
+
+        assertTrue(oldFile.exists())
+
+        val result = store.renameFolder(
+            folder.folder.id,
+            "College"
+        )
+
+        assertTrue(result is FolderNameResult.Renamed)
+
+        val newFile = File(
+            File(base, "College"),
+            "$noteId.md"
+        )
+
+        assertTrue(
+            "Markdown must exist in renamed folder",
+            newFile.exists()
+        )
+
+        assertFalse(
+            "Old Markdown file should be removed",
+            oldFile.exists()
+        )
+    }
+
+    // TEST 28: MARKDOWN MOVES AFTER FOLDER DELETE
+
+    @Test
+    fun markdownMovesAfterFolderDelete() {
+        val folder = store.createFolder("School")
+                as FolderNameResult.Created
+
+        val detail = sampleNote("School Note")
+        val noteId = store.saveNote(
+            detail.copy(
+                note = detail.note.copy(
+                    folderId = folder.folder.id
+                )
+            )
+        )
+
+        val base = context.getExternalFilesDir("notes")!!
+        val oldFile = File(
+            File(base, "School"),
+            "$noteId.md"
+        )
+
+        assertTrue(oldFile.exists())
+        assertTrue(store.deleteFolder(folder.folder.id))
+
+        val inboxFile = File(
+            File(base, "Inbox"),
+            "$noteId.md"
+        )
+
+        assertTrue(
+            "Markdown must move to Inbox",
+            inboxFile.exists()
+        )
+
+        assertFalse(
+            "Old Markdown file should be removed",
+            oldFile.exists()
+        )
     }
 }

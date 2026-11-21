@@ -15,7 +15,14 @@ import java.util.UUID
 class SQLiteTodoStore(context: Context) : TodoStore {
     private val app = context.applicationContext
     private val helper = TodoDatabaseHelper(app)
-    private val undo = mutableMapOf<String, Pair<NoteDetail, NoteDetail>>()
+
+    private data class UndoSnapshot(
+        val source: NoteDetail,
+        val targetId: Long,
+        val targetTitle: String
+    )
+
+    private val undo = mutableMapOf<String, UndoSnapshot>()
 
     private fun values(vararg pairs: Pair<String, Any?>): ContentValues =
         ContentValues().apply {
@@ -148,18 +155,41 @@ class SQLiteTodoStore(context: Context) : TodoStore {
                 "id=?",
                 arrayOf(id.toString())
             )
-            FolderNameResult.Renamed(existing.copy(name = clean))
+
+            val affected = noteIdsForFolder(id)
+            affected.forEach {
+                note(it)?.let(::writeMarkdown)
+            }
+
+            FolderNameResult.Renamed(
+                existing.copy(name = clean)
+            )
         } catch (_: SQLiteConstraintException) {
             FolderNameResult.Duplicate
         }
     }
 
-    override fun deleteFolder(id: Long): Boolean {
-        if (id == inboxId() || folder(id) == null) return false
+    private fun noteIdsForFolder(id: Long): List<Long> {
+        val ids = mutableListOf<Long>()
 
-        val affected = notes(NoteQuery())
-            .filter { it.folderId == id }
-            .map { it.id }
+        helper.readableDatabase.rawQuery(
+            "SELECT id FROM notes WHERE folder_id=?",
+            arrayOf(id.toString())
+        ).use { c ->
+            while (c.moveToNext()) {
+                ids.add(c.getLong(0))
+            }
+        }
+
+        return ids
+    }
+
+    override fun deleteFolder(id: Long): Boolean {
+        if (id == inboxId() || folder(id) == null) {
+            return false
+        }
+
+        val affected = noteIdsForFolder(id)
 
         val removed = transaction { db ->
             db.update(
@@ -181,6 +211,7 @@ class SQLiteTodoStore(context: Context) : TodoStore {
                 note(it)?.let(::writeMarkdown)
             }
         }
+
         return removed
     }
 
@@ -199,6 +230,7 @@ class SQLiteTodoStore(context: Context) : TodoStore {
                 counts[it.getLong(0)] = it.getInt(1)
             }
         }
+
         return counts
     }
 
@@ -275,9 +307,11 @@ class SQLiteTodoStore(context: Context) : TodoStore {
                         )
                     }
                 }
+
                 blocks.add(BlockDetail(block, entries))
             }
         }
+
         return NoteDetail(n, blocks)
     }
 
@@ -329,20 +363,6 @@ class SQLiteTodoStore(context: Context) : TodoStore {
             detail.note.id
         }
 
-        val oldEntryIds = previous?.allEntries()
-            ?.map { it.id }
-            ?.toSet()
-            .orEmpty()
-
-        val incomingEntryIds = detail.allEntries()
-            .map { it.id }
-            .filter { it > 0 }
-            .toSet()
-
-        oldEntryIds.minus(incomingEntryIds).forEach {
-            AlarmScheduler.cancelEntry(app, it)
-        }
-
         db.delete(
             "blocks",
             "note_id=?",
@@ -379,21 +399,50 @@ class SQLiteTodoStore(context: Context) : TodoStore {
                     "all_day" to entry.allDay
                 )
 
-                if (entry.id > 0) ev.put("id", entry.id)
+                if (entry.id > 0) {
+                    ev.put("id", entry.id)
+                }
 
                 db.insertOrThrow("entries", null, ev)
             }
         }
+
         return id
     }
 
     override fun saveNote(detail: NoteDetail): Long {
-        val id = transaction { save(it, detail) }
+        val previous =
+            if (detail.note.id > 0) {
+                note(detail.note.id)
+            } else null
 
-        note(id)?.let { updated ->
-            writeMarkdown(updated)
-            AlarmScheduler.syncNote(app, updated)
+        val id = transaction {
+            save(it, detail)
         }
+
+        val updated = note(id)
+
+        val currentIds = updated?.allEntries()
+            ?.map { it.id }
+            ?.toSet()
+            .orEmpty()
+
+        previous?.allEntries()
+            ?.filter { it.id !in currentIds }
+            ?.forEach {
+                AlarmScheduler.cancelEntry(app, it.id)
+            }
+
+        updated?.let {
+            writeMarkdown(it)
+
+            if (it.note.trashed || it.note.archived) {
+                AlarmScheduler.cancelNote(app, it)
+            } else {
+                AlarmScheduler.syncNote(app, it)
+            }
+        }
+
         return id
     }
 
@@ -401,7 +450,10 @@ class SQLiteTodoStore(context: Context) : TodoStore {
         id: Long,
         values: ContentValues
     ) {
-        values.put("updated_at", System.currentTimeMillis())
+        values.put(
+            "updated_at",
+            System.currentTimeMillis()
+        )
 
         helper.writableDatabase.update(
             "notes",
@@ -416,26 +468,48 @@ class SQLiteTodoStore(context: Context) : TodoStore {
     override fun setPinned(id: Long, pinned: Boolean) =
         updateNote(id, values("pinned" to pinned))
 
-    override fun setArchived(id: Long, archived: Boolean) =
+    override fun setArchived(id: Long, archived: Boolean) {
         updateNote(id, values("archived" to archived))
 
-    override fun moveNote(id: Long, folderId: Long): Boolean {
+        note(id)?.let {
+            if (archived) {
+                AlarmScheduler.cancelNote(app, it)
+            } else if (!it.note.trashed) {
+                AlarmScheduler.syncNote(app, it)
+            }
+        }
+    }
+
+    override fun moveNote(
+        id: Long,
+        folderId: Long
+    ): Boolean {
         if (folder(folderId) == null || note(id) == null) {
             return false
         }
 
-        updateNote(id, values("folder_id" to folderId))
+        updateNote(
+            id,
+            values("folder_id" to folderId)
+        )
+
         return true
     }
 
     override fun trashNote(id: Long) {
-        note(id)?.let { AlarmScheduler.cancelNote(app, it) }
+        note(id)?.let {
+            AlarmScheduler.cancelNote(app, it)
+        }
+
         updateNote(id, values("trashed" to true))
     }
 
     override fun restoreNote(id: Long) {
         updateNote(id, values("trashed" to false))
-        note(id)?.let { AlarmScheduler.syncNote(app, it) }
+
+        note(id)?.let {
+            AlarmScheduler.syncNote(app, it)
+        }
     }
 
     override fun deleteForever(id: Long) {
@@ -466,7 +540,10 @@ class SQLiteTodoStore(context: Context) : TodoStore {
         ids.forEach(::deleteForever)
     }
 
-    override fun markChecked(entryId: Long, checked: Boolean) {
+    override fun markChecked(
+        entryId: Long,
+        checked: Boolean
+    ) {
         val noteId = helper.readableDatabase.rawQuery(
             """
             SELECT b.note_id FROM entries e
@@ -475,7 +552,11 @@ class SQLiteTodoStore(context: Context) : TodoStore {
             """.trimIndent(),
             arrayOf(entryId.toString())
         ).use {
-            if (it.moveToFirst()) it.getLong(0) else return
+            if (it.moveToFirst()) {
+                it.getLong(0)
+            } else {
+                return
+            }
         }
 
         transaction { db ->
@@ -488,7 +569,9 @@ class SQLiteTodoStore(context: Context) : TodoStore {
 
             db.update(
                 "notes",
-                values("updated_at" to System.currentTimeMillis()),
+                values(
+                    "updated_at" to System.currentTimeMillis()
+                ),
                 "id=?",
                 arrayOf(noteId.toString())
             )
@@ -502,6 +585,7 @@ class SQLiteTodoStore(context: Context) : TodoStore {
 
     private fun summary(detail: NoteDetail): NoteSummary {
         val entries = detail.allEntries()
+
         val checkboxes = entries.filter {
             it.type == EntryType.CHECKBOX
         }
@@ -535,6 +619,7 @@ class SQLiteTodoStore(context: Context) : TodoStore {
                                 else -> ""
                             }
                         )
+
                         append(e.text).append('\n')
                     }
                 }
@@ -606,7 +691,10 @@ class SQLiteTodoStore(context: Context) : TodoStore {
             val search = needle.isEmpty() ||
                     n.title.contains(needle, true) ||
                     d.blocks.any { b ->
-                        b.block.heading.contains(needle, true) ||
+                        b.block.heading.contains(
+                            needle,
+                            true
+                        ) ||
                                 b.entries.any {
                                     it.text.contains(needle, true)
                                 }
@@ -632,6 +720,7 @@ class SQLiteTodoStore(context: Context) : TodoStore {
                     }) &&
                     when (f.status) {
                         StatusFilter.ANY -> true
+
                         StatusFilter.OPEN ->
                             checks.any { !it.checked }
 
@@ -654,7 +743,9 @@ class SQLiteTodoStore(context: Context) : TodoStore {
 
                 NoteSort.PRIORITY ->
                     compareBy {
-                        if (it.highestPriority == Priority.NONE) {
+                        if (
+                            it.highestPriority == Priority.NONE
+                        ) {
                             99
                         } else {
                             it.highestPriority.value
@@ -740,7 +831,8 @@ class SQLiteTodoStore(context: Context) : TodoStore {
                 ).sortedWith(
                 compareBy(
                     {
-                        if (it.first.entries.any { e ->
+                        if (
+                            it.first.entries.any { e ->
                                 e.priority == Priority.HIGHEST
                             }
                         ) 0 else 1
@@ -750,16 +842,7 @@ class SQLiteTodoStore(context: Context) : TodoStore {
             ).map { it.first }
 
         transaction { db ->
-            val oldEntries = source.allEntries()
-
-            oldEntries.forEach {
-                db.delete(
-                    "entries",
-                    "id=?",
-                    arrayOf(it.id.toString())
-                )
-            }
-
+            // Cascading source deletion frees its entry IDs.
             db.delete(
                 "notes",
                 "id=?",
@@ -775,32 +858,56 @@ class SQLiteTodoStore(context: Context) : TodoStore {
             )
         }
 
-        undo[token.id] =
-            source.deepCopy() to target.deepCopy()
+        undo[token.id] = UndoSnapshot(
+            source.deepCopy(),
+            targetId,
+            target.note.title
+        )
 
         note(targetId)?.let {
             writeMarkdown(it)
-            AlarmScheduler.syncNote(app, it)
+
+            if (it.note.archived) {
+                AlarmScheduler.cancelNote(app, it)
+            } else {
+                AlarmScheduler.syncNote(app, it)
+            }
         }
 
         deleteMirror(sourceId)
+
         return token
     }
 
-    override fun undoAppend(token: AppendUndoToken): Boolean {
-        val pair = undo[token.id] ?: return false
-        val (source, target) = pair
+    override fun undoAppend(
+        token: AppendUndoToken
+    ): Boolean {
+        val snapshot = undo[token.id] ?: return false
+        val source = snapshot.source
+        val target = note(snapshot.targetId) ?: return false
 
-        if (note(target.note.id) == null) return false
+        if (note(source.note.id) != null) return false
 
+        val appended = target.blocks.filter {
+            it.block.originNoteId == source.note.id
+        }
+
+        if (appended.isEmpty()) return false
+
+        val remaining = target.blocks.filterNot {
+            it.block.originNoteId == source.note.id
+        }
+
+        // Preserve target edits and restore original source.
         transaction { db ->
-            db.delete(
-                "notes",
-                "id=?",
-                arrayOf(target.note.id.toString())
+            val restoredTarget = NoteDetail(
+                target.note.copy(
+                    title = snapshot.targetTitle
+                ),
+                remaining
             )
 
-            saveWithIds(db, target)
+            save(db, restoredTarget)
             saveWithIds(db, source)
         }
 
@@ -919,12 +1026,17 @@ class SQLiteTodoStore(context: Context) : TodoStore {
                             EntryType.BULLET -> "- "
                             EntryType.NUMBERED -> "1. "
                             EntryType.CHECKBOX ->
-                                if (e.checked) "- [x] "
-                                else "- [ ] "
+                                if (e.checked) {
+                                    "- [x] "
+                                } else {
+                                    "- [ ] "
+                                }
                         }
                     )
+
                     append(e.text).append('\n')
                 }
+
                 append('\n')
             }
         }
