@@ -1,5 +1,55 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="black">#FF000000</color>
-    <color name="white">#FFFFFFFF</color>
+    <!-- Two-tone palette: mint paper, deep ink, one green accent. -->
+    <color name="color_primary">#0E7F46</color>
+    <color name="color_on_primary">#FFFFFF</color>
+    <color name="color_primary_container">#B7E9CE</color>
+    <color name="color_on_primary_container">#06301C</color>
+    <color name="color_accent">#19B866</color>
+    <color name="color_on_accent">#061211</color>
+    <color name="color_secondary">#2E5D4C</color>
+    <color name="color_on_secondary">#CEE0DF</color>
+    <color name="color_secondary_container">#BBD6CC</color>
+    <color name="color_on_secondary_container">#0A1F18</color>
+    <color name="color_tertiary">#0E7F46</color>
+    <color name="color_surface">#D9E9E6</color>
+    <color name="color_on_surface">#061211</color>
+    <color name="color_surface_variant">#C2D8D5</color>
+    <color name="color_on_surface_variant">#3D5C57</color>
+    <color name="color_outline">#7E9C95</color>
+    <color name="color_outline_variant">#A9C3BD</color>
+    <color name="color_error">#B3261E</color>
+    <color name="color_on_error">#FFFFFF</color>
+    <color name="color_surface_container">#D4E4E1</color>
+    <color name="color_surface_container_high">#D9E7E4</color>
+    <color name="color_surface_container_highest">#DEEBE9</color>
+    <color name="color_window_background">#CEE0DF</color>
+
+    <!-- Hairline used instead of elevation on cards, pills and the app bar. -->
+    <color name="color_hairline">#1A061211</color>
+    <color name="color_hairline_strong">#26061211</color>
+
+    <color name="icon_tint">#3D5C57</color>
+
+    <!-- Note cards keep their own tints, independent of the UI palette. -->
+    <color name="note_default">#FFFFFF</color>
+    <color name="note_red">#FADCDA</color>
+    <color name="note_orange">#FBE6CF</color>
+    <color name="note_yellow">#FBF1CB</color>
+    <color name="note_green">#DFEDD7</color>
+    <color name="note_teal">#D7ECE9</color>
+    <color name="note_blue">#DDE7F8</color>
+    <color name="note_indigo">#E2E4FA</color>
+    <color name="note_purple">#E9DFF7</color>
+    <color name="note_pink">#F8DEEA</color>
+    <color name="note_brown">#EEE0D5</color>
+    <color name="note_gray">#EAEAEF</color>
+
+    <!-- Meta pills sit on top of the note tint. -->
+    <color name="pill_background">#14061211</color>
+    <color name="deadline_normal">#2F4F49</color>
+    <color name="deadline_soon">#8A5300</color>
+    <color name="deadline_overdue">#B3261E</color>
+
+    <color name="ripple">#1F061211</color>
 </resources>

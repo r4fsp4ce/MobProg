@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <!-- Check state is managed by MainActivity so folder items can join the same list. -->
+    <group android:checkableBehavior="none">
+        <item
+            android:id="@+id/nav_notes"
+            android:checkable="true"
+            android:icon="@drawable/ic_notes"
+            android:orderInCategory="10"
+            android:title="@string/nav_notes" />
+        <item
+            android:id="@+id/nav_reminders"
+            android:checkable="true"
+            android:icon="@drawable/ic_reminders"
+            android:orderInCategory="20"
+            android:title="@string/nav_reminders" />
+        <item
+            android:id="@+id/nav_manage_folders"
+            android:icon="@drawable/ic_folder"
+            android:orderInCategory="60"
+            android:title="@string/nav_manage_folders" />
+        <item
+            android:id="@+id/nav_archive"
+            android:checkable="true"
+            android:icon="@drawable/ic_archive"
+            android:orderInCategory="100"
+            android:title="@string/nav_archive" />
+        <item
+            android:id="@+id/nav_trash"
+            android:checkable="true"
+            android:icon="@drawable/ic_trash"
+            android:orderInCategory="110"
+            android:title="@string/nav_trash" />
+        <item
+            android:id="@+id/nav_settings"
+            android:icon="@drawable/ic_settings"
+            android:orderInCategory="200"
+            android:title="@string/nav_settings" />
+    </group>
+</menu>

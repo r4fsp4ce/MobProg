@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Dark mode: deep ink background, mint text, the same green accent. -->
+    <color name="color_primary">#19B866</color>
+    <color name="color_on_primary">#061211</color>
+    <color name="color_primary_container">#0E3B24</color>
+    <color name="color_on_primary_container">#A9F2CB</color>
+    <color name="color_accent">#19B866</color>
+    <color name="color_on_accent">#061211</color>
+    <color name="color_secondary">#9DB8B3</color>
+    <color name="color_on_secondary">#102420</color>
+    <color name="color_secondary_container">#1B322D</color>
+    <color name="color_on_secondary_container">#D7E7E4</color>
+    <color name="color_tertiary">#7FE0AE</color>
+    <color name="color_surface">#0B1A18</color>
+    <color name="color_on_surface">#CEE0DF</color>
+    <color name="color_surface_variant">#10211F</color>
+    <color name="color_on_surface_variant">#9DB8B3</color>
+    <color name="color_outline">#3F5A55</color>
+    <color name="color_outline_variant">#243B37</color>
+    <color name="color_error">#FFB4AB</color>
+    <color name="color_on_error">#690005</color>
+    <color name="color_surface_container">#0B1A18</color>
+    <color name="color_surface_container_high">#10211F</color>
+    <color name="color_surface_container_highest">#152824</color>
+    <color name="color_window_background">#061211</color>
+
+    <color name="color_hairline">#1ACEE0DF</color>
+    <color name="color_hairline_strong">#26CEE0DF</color>
+
+    <color name="icon_tint">#9DB8B3</color>
+
+    <color name="note_default">#1C1C24</color>
+    <color name="note_red">#3B2625</color>
+    <color name="note_orange">#3A2E22</color>
+    <color name="note_yellow">#38331F</color>
+    <color name="note_green">#28352A</color>
+    <color name="note_teal">#223634</color>
+    <color name="note_blue">#242F3D</color>
+    <color name="note_indigo">#2A2D45</color>
+    <color name="note_purple">#2F2A3D</color>
+    <color name="note_pink">#3A2731</color>
+    <color name="note_brown">#332B26</color>
+    <color name="note_gray">#26262E</color>
+
+    <color name="pill_background">#14CEE0DF</color>
+    <color name="deadline_normal">#BFD3CF</color>
+    <color name="deadline_soon">#FFC46B</color>
+    <color name="deadline_overdue">#FFB4AB</color>
+
+    <color name="ripple">#33CEE0DF</color>
+</resources>

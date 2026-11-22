@@ -13,3 +13,7 @@
 .externalNativeBuild
 .cxx
 local.properties
+ARCHITECTURE.md
+
+# Local defect log; not part of the repository history.
+/docs/documented-defects.md

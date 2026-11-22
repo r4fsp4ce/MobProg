@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/quick_panel"
+    android:layout_width="360dp"
+    android:layout_height="wrap_content"
+    app:cardCornerRadius="@dimen/card_corner"
+    app:cardElevation="10dp"
+    app:strokeColor="@color/color_hairline"
+    app:strokeWidth="@dimen/card_stroke">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:paddingTop="@dimen/space_xxs"
+        android:paddingBottom="@dimen/space_xs">
+
+        <!-- Drag handle: the whole title row moves the overlay window. -->
+        <LinearLayout
+            android:id="@+id/quick_drag_handle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:contentDescription="@string/cd_drag_quick_note"
+            android:gravity="center_vertical"
+            android:minHeight="@dimen/touch_target"
+            android:orientation="horizontal"
+            android:paddingStart="@dimen/space_l"
+            android:paddingEnd="@dimen/space_l">
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="@string/quick_note_title"
+                android:textAppearance="?attr/textAppearanceTitleSmall"
+                android:textColor="?attr/colorOnSurfaceVariant" />
+        </LinearLayout>
+
+        <com.example.mobprog.ui.MaxHeightScrollView
+            android:id="@+id/quick_scroll"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:scrollbars="none">
+
+            <LinearLayout
+                android:id="@+id/quick_rows"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:paddingStart="@dimen/space_l"
+                android:paddingEnd="@dimen/space_s" />
+        </com.example.mobprog.ui.MaxHeightScrollView>
+
+        <TextView
+            android:id="@+id/quick_add_item"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/touch_target"
+            android:background="?attr/selectableItemBackground"
+            android:clickable="true"
+            android:focusable="true"
+            android:gravity="center_vertical"
+            android:paddingStart="@dimen/space_l"
+            android:paddingEnd="@dimen/space_l"
+            android:text="@string/action_add_item"
+            android:textColor="?attr/colorPrimary"
+            android:textSize="14sp" />
+
+        <com.example.mobprog.ui.RibbonView
+            android:id="@+id/quick_ribbon"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/space_xxs"
+            android:layout_marginEnd="@dimen/space_xxs" />
+    </LinearLayout>
+</com.google.android.material.card.MaterialCardView>

@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@drawable/bg_ribbon"
+    android:gravity="center_vertical"
+    android:orientation="horizontal"
+    android:paddingStart="@dimen/space_xxs"
+    android:paddingTop="@dimen/space_xxs"
+    android:paddingEnd="@dimen/space_xxs"
+    android:paddingBottom="@dimen/space_xxs">
+
+    <HorizontalScrollView
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:scrollbars="none">
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <ImageButton
+                android:id="@+id/ribbon_list_type"
+                style="@style/Widget.Tudow.RibbonButton"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:src="@drawable/ic_checklist" />
+
+            <ImageButton
+                android:id="@+id/ribbon_clock"
+                style="@style/Widget.Tudow.RibbonButton"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:contentDescription="@string/cd_clock"
+                android:src="@drawable/ic_clock" />
+
+            <ImageButton
+                android:id="@+id/ribbon_priority"
+                style="@style/Widget.Tudow.RibbonButton"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:contentDescription="@string/cd_priority"
+                android:src="@drawable/ic_flag" />
+
+            <ImageButton
+                android:id="@+id/ribbon_color"
+                style="@style/Widget.Tudow.RibbonButton"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:contentDescription="@string/cd_color"
+                android:src="@drawable/ic_palette" />
+
+            <!-- Undo/redo live in the scroll group so a narrow overlay still fits them. -->
+            <ImageButton
+                android:id="@+id/ribbon_undo"
+                style="@style/Widget.Tudow.RibbonButton"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:contentDescription="@string/cd_undo"
+                android:src="@drawable/ic_undo" />
+
+            <ImageButton
+                android:id="@+id/ribbon_redo"
+                style="@style/Widget.Tudow.RibbonButton"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:contentDescription="@string/cd_redo"
+                android:src="@drawable/ic_redo" />
+        </LinearLayout>
+    </HorizontalScrollView>
+
+    <!-- Kept outside the scroll group so it cannot scroll out of reach. -->
+    <ImageButton
+        android:id="@+id/ribbon_raw_markdown"
+        style="@style/Widget.Tudow.RibbonButton"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        android:contentDescription="@string/cd_raw_markdown"
+        android:src="@drawable/ic_raw_markdown"
+        android:visibility="gone" />
+
+    <View
+        android:layout_width="@dimen/divider"
+        android:layout_height="18dp"
+        android:layout_marginHorizontal="@dimen/space_xxs"
+        android:background="@color/color_hairline_strong" />
+
+    <ImageButton
+        android:id="@+id/ribbon_discard"
+        style="@style/Widget.Tudow.RibbonButton"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        android:contentDescription="@string/cd_discard"
+        android:src="@drawable/ic_close" />
+
+    <ImageButton
+        android:id="@+id/ribbon_save"
+        style="@style/Widget.Tudow.RibbonButton"
+        android:layout_marginStart="@dimen/space_xxs"
+        android:background="@drawable/bg_round_accent"
+        android:contentDescription="@string/cd_save"
+        android:padding="10dp"
+        android:src="@drawable/ic_check"
+        app:tint="@color/color_on_accent" />
+</LinearLayout>

@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    360x360 safe-zone logo: the artwork sits inside the 66 dp safe circle, so no
+    launcher mask clips it. The source is already square, so no insets are needed.
+-->
+<inset xmlns:android="http://schemas.android.com/apk/res/android"
+    android:drawable="@drawable/tudow_logo_safe" />
