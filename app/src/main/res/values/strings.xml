@@ -79,6 +79,7 @@
     <string name="cd_checked">Done</string>
     <string name="cd_unchecked">Not done</string>
     <string name="cd_quick_note">Open quick note</string>
+    <string name="cd_remove_bubble">Remove bubble</string>
     <string name="cd_drag_quick_note">Move quick note</string>
     <string name="cd_close">Close</string>
     <string name="cd_previous_month">Previous month</string>

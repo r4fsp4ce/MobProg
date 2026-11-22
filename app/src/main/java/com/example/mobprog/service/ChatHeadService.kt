@@ -3,14 +3,18 @@ package com.example.mobprog.service
 import android.animation.ValueAnimator
 import android.app.Service
 import android.content.Intent
+import android.content.res.ColorStateList
+import android.graphics.Color
 import android.graphics.PixelFormat
 import android.graphics.Point
 import android.graphics.Rect
+import android.graphics.drawable.GradientDrawable
 import android.os.Build
 import android.os.IBinder
 import android.provider.Settings
 import android.view.ContextThemeWrapper
 import android.view.Gravity
+import android.view.HapticFeedbackConstants
 import android.view.MotionEvent
 import android.view.View
 import android.view.WindowInsets
@@ -23,6 +27,7 @@ import com.example.mobprog.ui.DateTimePicker
 import com.example.mobprog.util.AppVisibility
 import com.example.mobprog.util.ThemePrefs
 import kotlin.math.abs
+import kotlin.math.hypot
 
 /**
  * Foreground service that keeps a draggable chat head above other apps and opens
@@ -31,6 +36,9 @@ import kotlin.math.abs
  * The head is hidden while one of the app's activities is in the foreground
  * (see [AppVisibility]); the service keeps running so it reappears immediately
  * when the app goes to the background.
+ *
+ * Dragging the head onto the circular X target removes the bubble, turns
+ * [QuickNotePrefs] off and stops the service, so only Settings can bring it back.
  */
 class ChatHeadService : Service() {
 
@@ -41,6 +49,9 @@ class ChatHeadService : Service() {
     private var panel: QuickNotePanel? = null
     private var panelParams: WindowManager.LayoutParams? = null
     private var deadlineOverlay: View? = null
+    private var removeTarget: ImageView? = null
+    private var removeTargetParams: WindowManager.LayoutParams? = null
+    private var removeArmed = false
 
     override fun onBind(intent: Intent?): IBinder? = null
 
@@ -83,12 +94,119 @@ class ChatHeadService : Service() {
         head.visibility = if (AppVisibility.isForeground) View.GONE else View.VISIBLE
     }
 
+    /**
+     * A circular X shown while the head is dragged. It is deliberately
+     * not touchable: the drag keeps going on the head's window, and dropping
+     * the head within reach of this target removes the bubble.
+     */
+    private fun showRemoveTarget() {
+        if (removeTarget != null) return
+        val size = dp(56)
+        val bounds = screenBounds()
+        val target = ImageView(this).apply {
+            setImageResource(R.drawable.ic_close)
+            imageTintList = ColorStateList.valueOf(Color.WHITE)
+            val pad = dp(16)
+            setPadding(pad, pad, pad, pad)
+            background = removeTargetDrawable(armed = false)
+            contentDescription = getString(R.string.cd_remove_bubble)
+            alpha = 0f
+            scaleX = 0.6f
+            scaleY = 0.6f
+        }
+        val params = WindowManager.LayoutParams(
+            size,
+            size,
+            WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY,
+            WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE or
+                WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE,
+            PixelFormat.TRANSLUCENT
+        ).apply {
+            // Same gravity and coordinate space as the head, so the drop test
+            // can compare the two rectangles directly.
+            gravity = Gravity.TOP or Gravity.START
+            x = (bounds.width() - size) / 2
+            y = bounds.bottom - systemBarInsets().bottom - size - dp(28)
+        }
+        removeTarget = target
+        removeTargetParams = params
+        removeArmed = false
+        windowManager.addView(target, params)
+        target.animate()
+            .alpha(1f)
+            .scaleX(1f)
+            .scaleY(1f)
+            .setDuration(140L)
+            .start()
+    }
+
+    /** Highlights the target when the head is close enough to be dropped on it. */
+    private fun setRemoveTargetArmed(armed: Boolean) {
+        if (removeArmed == armed) return
+        removeArmed = armed
+        val target = removeTarget ?: return
+        target.background = removeTargetDrawable(armed)
+        target.animate()
+            .scaleX(if (armed) 1.12f else 1f)
+            .scaleY(if (armed) 1.12f else 1f)
+            .setDuration(100L)
+            .start()
+        if (armed) {
+            target.performHapticFeedback(HapticFeedbackConstants.LONG_PRESS)
+        }
+    }
+
+    private fun removeTargetDrawable(armed: Boolean): GradientDrawable =
+        GradientDrawable().apply {
+            shape = GradientDrawable.OVAL
+            setColor(
+                this@ChatHeadService.getColor(
+                    if (armed) R.color.color_error else R.color.color_on_surface
+                )
+            )
+        }
+
+    private fun isOverRemoveTarget(
+        view: View,
+        params: WindowManager.LayoutParams
+    ): Boolean {
+        val target = removeTarget ?: return false
+        val targetParams = removeTargetParams ?: return false
+        val targetSize = if (target.width > 0) target.width else dp(56)
+        val headSize = if (view.width > 0) view.width else dp(56)
+        val targetCx = targetParams.x + targetSize / 2f
+        val targetCy = targetParams.y + targetSize / 2f
+        val headCx = params.x + headSize / 2f
+        val headCy = params.y + headSize / 2f
+        return hypot(
+            (headCx - targetCx).toDouble(),
+            (headCy - targetCy).toDouble()
+        ) <= dp(52)
+    }
+
+    private fun removeRemoveTarget() {
+        removeArmed = false
+        val target = removeTarget ?: return
+        removeTarget = null
+        removeTargetParams = null
+        runCatching { windowManager.removeView(target) }
+    }
+
+    /** Drops the bubble and remembers the choice, so the app does not restart it. */
+    private fun dismissBubble() {
+        QuickNotePrefs.setEnabled(this, false)
+        closePanel()
+        removeRemoveTarget()
+        stopSelf()
+    }
+
     private fun applyBubbleVisibility(visible: Boolean) {
         val head = chatHead ?: return
         if (visible) {
             head.visibility = View.VISIBLE
         } else {
             head.visibility = View.GONE
+            removeRemoveTarget()
             closePanel()
             removeDeadlineOverlay()
         }
@@ -246,21 +364,33 @@ class ChatHeadService : Service() {
                 MotionEvent.ACTION_MOVE -> {
                     val dx = (event.rawX - downX).toInt()
                     val dy = (event.rawY - downY).toInt()
-                    if (abs(dx) > dp(4) || abs(dy) > dp(4)) moved = true
+                    if (abs(dx) > dp(4) || abs(dy) > dp(4)) {
+                        moved = true
+                        showRemoveTarget()
+                    }
                     params.x = startX + dx
                     params.y = startY + dy
                     runCatching { windowManager.updateViewLayout(view, params) }
+                    setRemoveTargetArmed(isOverRemoveTarget(view, params))
                     return true
                 }
                 MotionEvent.ACTION_UP -> {
+                    if (moved && isOverRemoveTarget(view, params)) {
+                        dismissBubble()
+                        return true
+                    }
                     if (moved) {
                         snapToEdge(view, params)
                     } else {
                         onTap()
                     }
+                    removeRemoveTarget()
                     return true
                 }
-                MotionEvent.ACTION_CANCEL -> return true
+                MotionEvent.ACTION_CANCEL -> {
+                    removeRemoveTarget()
+                    return true
+                }
             }
             return false
         }
@@ -329,6 +459,7 @@ class ChatHeadService : Service() {
         super.onDestroy()
         closePanel()
         removeDeadlineOverlay()
+        removeRemoveTarget()
         chatHead?.let { head -> runCatching { windowManager.removeView(head) } }
         chatHead = null
         if (instance === this) instance = null
