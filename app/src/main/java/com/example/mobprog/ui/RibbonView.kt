@@ -76,9 +76,30 @@ class RibbonView @JvmOverloads constructor(
         binding.ribbonRedo.alpha = if (enabled) 1f else 0.4f
     }
 
-    /** The raw-Markdown button only appears while text is being edited and the option is on. */
+    /** Shows or hides the Markdown toggle; the editor keeps it visible while the source is open. */
     fun showRawMarkdown(visible: Boolean) {
         binding.ribbonRawMarkdown.isVisible = visible
+    }
+
+    /** Highlights the button while the editor shows the Markdown source. */
+    fun setRawMarkdownActive(active: Boolean) {
+        binding.ribbonRawMarkdown.imageTintList = ColorStateList.valueOf(
+            ContextCompat.getColor(
+                context,
+                if (active) R.color.color_primary else R.color.icon_tint
+            )
+        )
+        binding.ribbonRawMarkdown.contentDescription = context.getString(
+            if (active) R.string.cd_rich_text else R.string.cd_raw_markdown
+        )
+    }
+
+    /** Source mode has no rows, so the actions that change one are switched off. */
+    fun setTypingEnabled(enabled: Boolean) {
+        listOf(binding.ribbonListType, binding.ribbonClock, binding.ribbonPriority).forEach {
+            it.isEnabled = enabled
+            it.alpha = if (enabled) 1f else 0.4f
+        }
     }
 
     fun showListType(type: EntryType) {

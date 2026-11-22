@@ -1,13 +1,10 @@
 package com.example.mobprog
 
 import android.content.Intent
-import android.graphics.Typeface
 import android.os.Bundle
 import android.view.View
 import android.widget.LinearLayout
 import android.widget.PopupMenu
-import android.widget.ScrollView
-import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.OnBackPressedCallback
@@ -57,7 +54,10 @@ class NoteEditorActivity : AppCompatActivity(), RibbonView.Listener, BlockEditor
     private var noteId: Long = -1L
     private var initialFolderId: Long = -1L
     private var focusedRow: EntryRowView? = null
-    private var editorFocused = false
+
+    /** True while the body is showing the Markdown source instead of the blocks. */
+    private var rawMode = false
+    private var rawBaseline: String = ""
 
     private val blockViews = mutableListOf<BlockEditorView>()
     private val undoShelf = ArrayDeque<NoteDraft>()
@@ -85,7 +85,6 @@ class NoteEditorActivity : AppCompatActivity(), RibbonView.Listener, BlockEditor
         ribbon = binding.ribbon
         ribbon.listener = this
         ribbon.showUndoRedo(true)
-        ribbon.showRawMarkdown(false)
 
         noteId = intent.getLongExtra(EXTRA_NOTE_ID, -1L)
         initialFolderId = intent.getLongExtra(EXTRA_FOLDER_ID, -1L)
@@ -107,9 +106,8 @@ class NoteEditorActivity : AppCompatActivity(), RibbonView.Listener, BlockEditor
         binding.titleInput.doAfterTextChanged {
             if (!loading) noteTextChanged()
         }
-        binding.titleInput.setOnFocusChangeListener { _, hasFocus ->
-            editorFocused = hasFocus
-            refreshRawMarkdownButton()
+        binding.markdownInput.doAfterTextChanged {
+            if (!loading) noteTextChanged()
         }
 
         onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
@@ -155,11 +153,25 @@ class NoteEditorActivity : AppCompatActivity(), RibbonView.Listener, BlockEditor
         rebuildBlocks()
         updateFolderChip()
         updateRibbon()
+        applyMode()
+        if (rawMode) {
+            val source = NoteMarkdown.from(draft)
+            binding.markdownInput.setText(source)
+            rawBaseline = source
+        }
         loading = false
         textSnapshotTaken = false
         textBaseline = collectDraft()
         updateUndoRedo()
         refreshRawMarkdownButton()
+    }
+
+    /** Keeps the visible body in sync with [rawMode]. */
+    private fun applyMode() {
+        binding.editorScroll.isVisible = !rawMode
+        binding.markdownInput.isVisible = rawMode
+        ribbon.setRawMarkdownActive(rawMode)
+        ribbon.setTypingEnabled(!rawMode)
     }
 
     private fun rebuildBlocks() {
@@ -179,7 +191,6 @@ class NoteEditorActivity : AppCompatActivity(), RibbonView.Listener, BlockEditor
             blockViews += view
         }
         focusedRow = null
-        editorFocused = false
         if (blockViews.isEmpty()) {
             addBlock()
         }
@@ -208,9 +219,16 @@ class NoteEditorActivity : AppCompatActivity(), RibbonView.Listener, BlockEditor
 
     // region draft handling
 
-    private fun collectDraft(): NoteDraft = draft.copyDraft().also { collected ->
-        collected.title = binding.titleInput.text?.toString().orEmpty()
-        collected.blocks = blockViews.map { it.collect() }.toMutableList()
+    private fun collectDraft(): NoteDraft {
+        if (rawMode) {
+            // The source text is the truth while the pane is open; parse keeps
+            // priorities and deadlines that Markdown itself cannot hold.
+            return NoteMarkdown.parse(binding.markdownInput.text?.toString().orEmpty(), draft)
+        }
+        return draft.copyDraft().also { collected ->
+            collected.title = binding.titleInput.text?.toString().orEmpty()
+            collected.blocks = blockViews.map { it.collect() }.toMutableList()
+        }
     }
 
     private fun activeRow(): EntryRowView? =
@@ -382,29 +400,46 @@ class NoteEditorActivity : AppCompatActivity(), RibbonView.Listener, BlockEditor
 
     override fun onSave() = save()
 
-    override fun onRawMarkdown() = showRawMarkdown()
+    override fun onRawMarkdown() = toggleRawMarkdown()
 
-    /** The button is opt-in and only shows while a field has the cursor. */
+    /** The button is opt-in in Settings and then always available in the editor. */
     private fun refreshRawMarkdownButton() {
-        ribbon.showRawMarkdown(EditorPrefs.isRawMarkdownEnabled(this) && editorFocused)
+        // Keep it while the source is open, even if the setting was turned off
+        // in the meantime, or there would be no way back to the blocks.
+        ribbon.showRawMarkdown(EditorPrefs.isRawMarkdownEnabled(this) || rawMode)
+        ribbon.setRawMarkdownActive(rawMode)
     }
 
-    private fun showRawMarkdown() {
-        val markdown = NoteMarkdown.from(collectDraft())
-        val pad = (20 * resources.displayMetrics.density).toInt()
-        val text = TextView(this).apply {
-            text = markdown.ifBlank { getString(R.string.raw_markdown_empty) }
-            typeface = Typeface.MONOSPACE
-            textSize = 13f
-            setTextIsSelectable(true)
-            setTextColor(ContextCompat.getColor(this@NoteEditorActivity, R.color.color_on_surface))
-            setPadding(pad, pad, pad, pad)
-        }
-        MaterialAlertDialogBuilder(this)
-            .setTitle(R.string.raw_markdown_title)
-            .setView(ScrollView(this).apply { addView(text) })
-            .setPositiveButton(R.string.action_close, null)
-            .show()
+    /** Shows the whole body as editable Markdown, or the blocks again. */
+    private fun toggleRawMarkdown() {
+        if (loading) return
+        if (rawMode) exitRawMode() else enterRawMode()
+    }
+
+    private fun enterRawMode() {
+        draft = collectDraft()
+        rawMode = true
+        val source = NoteMarkdown.from(draft)
+        loading = true
+        binding.markdownInput.setText(source)
+        loading = false
+        rawBaseline = source
+        textBaseline = draft
+        textSnapshotTaken = false
+        applyMode()
+        updateUndoRedo()
+        binding.markdownInput.requestFocus()
+        binding.markdownInput.setSelection(0)
+    }
+
+    private fun exitRawMode() {
+        val source = binding.markdownInput.text?.toString().orEmpty()
+        val changed = source != rawBaseline
+        rawMode = false
+        // An untouched pane restores the draft exactly; an edited one is parsed
+        // and keeps each line's priority and deadline through the diff.
+        if (changed) draft = NoteMarkdown.parse(source, draft)
+        renderAll()
     }
 
     // endregion
@@ -433,15 +468,22 @@ class NoteEditorActivity : AppCompatActivity(), RibbonView.Listener, BlockEditor
 
     override fun onEntryFocused(row: EntryRowView) {
         focusedRow = row
-        editorFocused = true
         ribbon.showListType(row.draft.type)
         ribbon.showPriority(row.draft.priority)
-        refreshRawMarkdownButton()
     }
 
-    override fun onEntryBlur(row: EntryRowView) {
-        editorFocused = binding.titleInput.hasFocus()
-        refreshRawMarkdownButton()
+    override fun onEntryEnter(row: EntryRowView, remainder: String) {
+        if (loading) return
+        val block = blockContaining(row) ?: return
+        // The row has already lost the newline and its tail, so re-join them to
+        // recover the pre-Enter text; otherwise undo would drop the tail.
+        val snapshot = collectDraft()
+        val blockIndex = blockViews.indexOf(block)
+        val rowIndex = block.rows().indexOf(row)
+        val source = snapshot.blocks.getOrNull(blockIndex)?.entries?.getOrNull(rowIndex)
+        if (source != null) source.text = source.text + remainder
+        pushUndo(snapshot)
+        block.addEntryAfter(row, remainder)
     }
 
     override fun onEntryDeadline(row: EntryRowView) {
@@ -519,10 +561,10 @@ class NoteEditorActivity : AppCompatActivity(), RibbonView.Listener, BlockEditor
         MaterialAlertDialogBuilder(this)
             .setTitle(R.string.dialog_delete_note_title)
             .setMessage(
-                if (draft.title.isBlank()) {
+                if (collectDraft().title.isBlank()) {
                     getString(R.string.dialog_delete_note_message_untitled)
                 } else {
-                    getString(R.string.dialog_delete_note_message, draft.title)
+                    getString(R.string.dialog_delete_note_message, collectDraft().title)
                 }
             )
             .setNegativeButton(R.string.action_cancel, null)

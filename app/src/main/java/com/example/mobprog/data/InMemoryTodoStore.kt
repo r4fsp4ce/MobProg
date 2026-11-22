@@ -222,7 +222,8 @@ class InMemoryTodoStore(private val seedDemoData: Boolean = true) : TodoStore {
         detail.blocks.forEach { block ->
             if (block.block.heading.isNotBlank()) {
                 if (builder.isNotEmpty()) builder.append('\n')
-                builder.append("**").append(block.block.heading).append("**\n")
+                // Two trailing spaces: a hard break, so the items start on their own line.
+                builder.append("**").append(block.block.heading).append("**  \n")
             }
             block.entries.forEach { entry ->
                 if (entry.type == EntryType.CHECKBOX || entry.text.isBlank()) return@forEach
@@ -231,7 +232,7 @@ class InMemoryTodoStore(private val seedDemoData: Boolean = true) : TodoStore {
                     EntryType.NUMBERED -> builder.append("1. ")
                     else -> Unit
                 }
-                builder.append(entry.text).append('\n')
+                builder.append(entry.text).append("  \n")
             }
         }
         return builder.toString().trim().take(600)

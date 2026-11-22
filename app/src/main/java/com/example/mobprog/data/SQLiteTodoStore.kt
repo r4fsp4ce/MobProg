@@ -604,7 +604,9 @@ class SQLiteTodoStore(context: Context) : TodoStore {
         val markdown = buildString {
             detail.blocks.forEach { b ->
                 if (b.block.heading.isNotBlank()) {
-                    append("**${b.block.heading}**\n")
+                    // Two trailing spaces make a Markdown hard break; a single
+                    // newline is a soft break and would join the next line.
+                    append("**${b.block.heading}**  \n")
                 }
 
                 b.entries.forEach { e ->
@@ -620,7 +622,7 @@ class SQLiteTodoStore(context: Context) : TodoStore {
                             }
                         )
 
-                        append(e.text).append('\n')
+                        append(e.text).append("  \n")
                     }
                 }
             }

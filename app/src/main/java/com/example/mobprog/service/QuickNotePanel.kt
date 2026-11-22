@@ -51,10 +51,7 @@ class QuickNotePanel(
     private val store: TodoStore get() = StoreProvider.get()
 
     private var defaultType: EntryType = EntryType.CHECKBOX
-    private var priority: Priority = Priority.NONE
     private var color: NoteColor = NoteColor.DEFAULT
-    private var deadlineAt: Long? = null
-    private var allDay: Boolean = false
 
     private class Line(val binding: ViewQuickNoteRowBinding, val draft: EntryDraft)
 
@@ -74,7 +71,7 @@ class QuickNotePanel(
         binding.quickRibbon.listener = this
         binding.quickRibbon.showUndoRedo(true)
         binding.quickRibbon.showListType(defaultType)
-        binding.quickRibbon.showPriority(priority)
+        binding.quickRibbon.showPriority(Priority.NONE)
         binding.quickRibbon.showColor(color)
         binding.quickRibbon.showClock(null)
         binding.quickScroll.maxHeight = dp(228)
@@ -123,22 +120,31 @@ class QuickNotePanel(
     }
 
     override fun onClock() {
-        showDeadlinePicker(deadlineAt, allDay) { millis, isAllDay ->
-            deadlineAt = millis
-            allDay = isAllDay
-            binding.quickRibbon.showClock(Dates.deadlineLabel(themed, millis, isAllDay))
+        val line = activeLine() ?: return
+        showDeadlinePicker(line.draft.deadlineAt, line.draft.allDay) { millis, isAllDay ->
+            line.draft.deadlineAt = millis
+            line.draft.allDay = isAllDay
+            bindLine(line)
+            showLineState(line)
+            recordHistory()
         }
     }
 
-    override fun onPriority() {
-        val popup = PopupMenu(themed, binding.quickRibbon.priorityAnchor)
+    override fun onPriority() = showPriorityMenu(binding.quickRibbon.priorityAnchor)
+
+    /** Priority menu for the active row, anchored on the ribbon button. */
+    private fun showPriorityMenu(anchor: View) {
+        val line = activeLine() ?: return
+        val popup = PopupMenu(themed, anchor)
         val options = Priority.selectable + Priority.NONE
         options.forEachIndexed { index, option ->
             popup.menu.add(0, option.value, index, themed.getString(option.labelRes))
         }
         popup.setOnMenuItemClickListener { item ->
-            priority = Priority.fromValue(item.itemId)
-            binding.quickRibbon.showPriority(priority)
+            line.draft.priority = Priority.fromValue(item.itemId)
+            bindLine(line)
+            showLineState(line)
+            recordHistory()
             true
         }
         popup.show()
@@ -179,7 +185,7 @@ class QuickNotePanel(
 
     // region lines
 
-    private fun addLine(draft: EntryDraft, focus: Boolean) {
+    private fun addLine(draft: EntryDraft, focus: Boolean, index: Int = -1) {
         val rowBinding = ViewQuickNoteRowBinding.inflate(
             LayoutInflater.from(themed),
             binding.quickRows,
@@ -192,14 +198,31 @@ class QuickNotePanel(
 
         rowBinding.quickEntryText.doAfterTextChanged { editable ->
             if (applyingHistory) return@doAfterTextChanged
-            draft.text = editable?.toString().orEmpty()
-            scheduleHistory()
+            val value = editable?.toString().orEmpty()
+            val newline = value.indexOf('\n')
+            if (newline < 0) {
+                draft.text = value
+                scheduleHistory()
+                return@doAfterTextChanged
+            }
+            // Enter starts the next item; the text after it moves into the new row.
+            val before = value.substring(0, newline)
+            val after = value.substring(newline + 1)
+            draft.text = before
+            rowBinding.quickEntryText.setText(before)
+            rowBinding.quickEntryText.setSelection(before.length)
+            addLineAfter(line, after)
+            recordHistory()
         }
         rowBinding.quickEntryText.setOnFocusChangeListener { _, hasFocus ->
             if (hasFocus) {
                 focused = line
-                binding.quickRibbon.showListType(draft.type)
+                showLineState(line)
             }
+        }
+        rowBinding.quickEntryDeadline.setOnClickListener {
+            focused = line
+            onClock()
         }
         rowBinding.quickEntryCheckbox.setOnCheckedChangeListener { _, checked ->
             if (applyingHistory) return@setOnCheckedChangeListener
@@ -207,8 +230,9 @@ class QuickNotePanel(
             recordHistory()
         }
 
-        binding.quickRows.addView(rowBinding.root)
-        lines.add(line)
+        val position = if (index in 0..lines.size) index else lines.size
+        binding.quickRows.addView(rowBinding.root, position)
+        lines.add(position, line)
         bindLine(line)
         renumber()
 
@@ -221,9 +245,16 @@ class QuickNotePanel(
                 )
             }
             binding.quickScroll.post {
-                binding.quickScroll.smoothScrollTo(0, binding.quickRows.height)
+                binding.quickScroll.smoothScrollTo(0, rowBinding.root.top)
             }
         }
+    }
+
+    /** Splits the text after a newline into a new row directly below [line]. */
+    private fun addLineAfter(line: Line, text: String) {
+        val index = lines.indexOf(line)
+        if (index < 0) return
+        addLine(EntryDraft(type = line.draft.type, text = text), focus = true, index = index + 1)
     }
 
     private fun bindLine(line: Line) {
@@ -235,6 +266,39 @@ class QuickNotePanel(
         prefix.isVisible = type == EntryType.BULLET || type == EntryType.NUMBERED
         prefix.text = prefixFor(line)
         prefix.contentDescription = themed.getString(type.labelRes)
+
+        val priority = line.draft.priority
+        val priorityPill = line.binding.quickEntryPriority
+        priorityPill.isVisible = priority != Priority.NONE
+        if (priority != Priority.NONE) {
+            priorityPill.text = priority.badge
+            priorityPill.contentDescription = themed.getString(
+                R.string.priority_label,
+                themed.getString(priority.labelRes)
+            )
+        }
+
+        val deadline = line.draft.deadlineAt
+        val deadlinePill = line.binding.quickEntryDeadline
+        deadlinePill.isVisible = deadline != null
+        if (deadline != null) {
+            val label = Dates.deadlineLabel(themed, deadline, line.draft.allDay)
+            deadlinePill.text = label
+            deadlinePill.contentDescription =
+                themed.getString(R.string.deadline_chip_description, label)
+            deadlinePill.setTextColor(
+                themed.getColor(
+                    if (Dates.isPast(deadline)) {
+                        R.color.deadline_overdue
+                    } else {
+                        R.color.deadline_normal
+                    }
+                )
+            )
+        }
+
+        line.binding.quickEntryMeta.isVisible =
+            priority != Priority.NONE || deadline != null
     }
 
     private fun prefixFor(line: Line): String = when (line.draft.type) {
@@ -252,6 +316,19 @@ class QuickNotePanel(
     }
 
     private fun currentType(): EntryType = focused?.draft?.type ?: defaultType
+
+    private fun activeLine(): Line? = focused ?: lines.lastOrNull()
+
+    /** The ribbon mirrors the row that owns the cursor, or the last row. */
+    private fun showLineState(line: Line) {
+        binding.quickRibbon.showListType(line.draft.type)
+        binding.quickRibbon.showPriority(line.draft.priority)
+        binding.quickRibbon.showClock(
+            line.draft.deadlineAt?.let {
+                Dates.deadlineLabel(themed, it, line.draft.allDay)
+            }
+        )
+    }
 
     /** requestFocus can throw if the panel window is already going away. */
     private inline fun guarded(block: () -> Unit) {
@@ -304,7 +381,14 @@ class QuickNotePanel(
         applyingHistory = false
         defaultType = lines.lastOrNull()?.draft?.type ?: defaultType
         renumber()
-        binding.quickRibbon.showListType(defaultType)
+        val last = lines.lastOrNull()
+        if (last != null) {
+            showLineState(last)
+        } else {
+            binding.quickRibbon.showListType(defaultType)
+            binding.quickRibbon.showPriority(Priority.NONE)
+            binding.quickRibbon.showClock(null)
+        }
         updateUndoState()
     }
 
@@ -331,9 +415,9 @@ class QuickNotePanel(
                 type = draft.type,
                 text = draft.text.trim(),
                 checked = draft.checked,
-                priority = priority,
-                deadlineAt = deadlineAt,
-                allDay = allDay
+                priority = draft.priority,
+                deadlineAt = draft.deadlineAt,
+                allDay = draft.allDay
             )
         }
         val note = Note(

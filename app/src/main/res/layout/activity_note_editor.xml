@@ -83,6 +83,26 @@
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>
 
+    <!-- Raw-Markdown source mode: replaces the scroll above while it is on. -->
+    <EditText
+        android:id="@+id/markdown_input"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:background="@null"
+        android:gravity="top|start"
+        android:hint="@string/raw_markdown_hint"
+        android:inputType="textMultiLine|textNoSuggestions"
+        android:paddingStart="@dimen/screen_padding"
+        android:paddingTop="@dimen/space_s"
+        android:paddingEnd="@dimen/screen_padding"
+        android:paddingBottom="@dimen/space_s"
+        android:scrollbars="vertical"
+        android:textColor="?attr/colorOnSurface"
+        android:textColorHint="?attr/colorOnSurfaceVariant"
+        android:textSize="14sp"
+        android:visibility="gone" />
+
     <com.example.mobprog.ui.RibbonView
         android:id="@+id/ribbon"
         android:layout_width="match_parent"

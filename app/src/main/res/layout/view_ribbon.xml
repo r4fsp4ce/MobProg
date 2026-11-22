@@ -64,16 +64,17 @@
                 android:background="?attr/selectableItemBackgroundBorderless"
                 android:contentDescription="@string/cd_redo"
                 android:src="@drawable/ic_redo" />
-
-            <ImageButton
-                android:id="@+id/ribbon_raw_markdown"
-                style="@style/Widget.Tudow.RibbonButton"
-                android:background="?attr/selectableItemBackgroundBorderless"
-                android:contentDescription="@string/cd_raw_markdown"
-                android:src="@drawable/ic_raw_markdown"
-                android:visibility="gone" />
         </LinearLayout>
     </HorizontalScrollView>
+
+    <!-- Kept outside the scroll group so it cannot scroll out of reach. -->
+    <ImageButton
+        android:id="@+id/ribbon_raw_markdown"
+        style="@style/Widget.Tudow.RibbonButton"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        android:contentDescription="@string/cd_raw_markdown"
+        android:src="@drawable/ic_raw_markdown"
+        android:visibility="gone" />
 
     <View
         android:layout_width="@dimen/divider"

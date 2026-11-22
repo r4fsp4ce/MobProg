@@ -12,7 +12,8 @@ import com.example.mobprog.model.Reminder
 import com.example.mobprog.util.Dates
 
 /**
- * Deadline reminders at fixed offsets: 1 day, 2 hours, 1 hour and 30 minutes before.
+ * Deadline reminders at fixed offsets: 1 day, 2 hours, 1 hour and 30 minutes before,
+ * plus one at the deadline itself. That last one posts on the alarm channel.
  *
  * Each (entry, offset) pair gets its own PendingIntent, so an entry can be cancelled
  * without touching its neighbours. Offsets already in the past are skipped.
@@ -20,7 +21,7 @@ import com.example.mobprog.util.Dates
 object AlarmScheduler {
 
     /** Minutes before the deadline; index is part of the request code. */
-    private val offsetsMinutes = listOf(24 * 60, 2 * 60, 60, 30)
+    private val offsetsMinutes = listOf(24 * 60, 2 * 60, 60, 30, 0)
 
     /** Schedules (or re-schedules) every alarm for one entry. Cancels first. */
     fun syncEntry(context: Context, noteId: Long, entry: Entry, noteTitle: String) {

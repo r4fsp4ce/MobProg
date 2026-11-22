@@ -68,7 +68,8 @@
     <string name="cd_redo">Redo</string>
     <string name="cd_discard">Discard changes</string>
     <string name="cd_save">Save note</string>
-    <string name="cd_raw_markdown">Show raw Markdown</string>
+    <string name="cd_raw_markdown">Show Markdown source</string>
+    <string name="cd_rich_text">Show rich text</string>
     <string name="cd_delete_block">Delete block</string>
     <string name="cd_block_up">Move block up</string>
     <string name="cd_block_down">Move block down</string>
@@ -246,7 +247,7 @@
     <string name="settings_theme_light">Light</string>
     <string name="settings_theme_dark">Dark</string>
     <string name="settings_show_raw_markdown">Show raw Markdown button</string>
-    <string name="settings_show_raw_markdown_summary">Adds a button to the note toolbar while you are typing.</string>
+    <string name="settings_show_raw_markdown_summary">Adds a button that swaps the note body for its Markdown source and back.</string>
     <string name="settings_group_quick_note">Quick note</string>
     <string name="settings_quick_note_toggle">Enable quick note bubble</string>
     <string name="settings_quick_note_summary">A floating bubble lets you write a note from any app.</string>
@@ -255,7 +256,7 @@
     <string name="settings_overlay_denied_message">Without this permission the bubble cannot be shown, so the feature stays off.</string>
     <string name="settings_open_system_settings">Open system settings</string>
     <string name="settings_group_notifications">Reminders</string>
-    <string name="settings_notifications_summary">Reminders arrive 1 day, 2 hours, 1 hour and 30 minutes before a deadline.</string>
+    <string name="settings_notifications_summary">Reminders arrive 1 day, 2 hours, 1 hour and 30 minutes before a deadline, and an alarm sounds when it is reached.</string>
     <string name="settings_notification_allowed">Notifications are allowed</string>
     <string name="settings_notification_denied">Notifications are blocked</string>
     <string name="settings_notification_grant">Allow notifications</string>
@@ -274,8 +275,7 @@
     <string name="quick_note_empty">Write something first.</string>
 
     <!-- Raw Markdown -->
-    <string name="raw_markdown_title">Raw Markdown</string>
-    <string name="raw_markdown_empty">This note is empty.</string>
+    <string name="raw_markdown_hint">Markdown source</string>
 
     <!-- Deadline dialog -->
     <string name="deadline_title">Deadline</string>
@@ -298,6 +298,8 @@
     <!-- Notifications -->
     <string name="notification_channel_deadlines">Deadline reminders</string>
     <string name="notification_channel_deadlines_description">Reminders for list items with a deadline</string>
+    <string name="notification_channel_deadline_alarm">Deadline alarm</string>
+    <string name="notification_channel_deadline_alarm_description">Plays the alarm sound when a deadline is reached</string>
     <string name="notification_channel_quick_note">Quick note bubble</string>
     <string name="notification_channel_quick_note_description">Keeps the floating quick-note bubble running</string>
     <string name="notification_title">%1$s</string>

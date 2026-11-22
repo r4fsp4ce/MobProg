@@ -27,7 +27,7 @@ class BlockEditorView @JvmOverloads constructor(
         fun onBlockDown(view: BlockEditorView)
         fun onBlockDelete(view: BlockEditorView)
         fun onEntryFocused(row: EntryRowView)
-        fun onEntryBlur(row: EntryRowView)
+        fun onEntryEnter(row: EntryRowView, remainder: String)
         fun onEntryDeadline(row: EntryRowView)
         fun onEntryDeadlineLong(row: EntryRowView)
         fun onContentChanged()
@@ -85,6 +85,8 @@ class BlockEditorView @JvmOverloads constructor(
                 )
             }
         }
+        // Let the editor snapshot the pre-add state so undo can remove this row.
+        callback?.onContentChanged()
     }
 
     fun setEntryType(row: EntryRowView, type: EntryType) {
@@ -96,14 +98,46 @@ class BlockEditorView @JvmOverloads constructor(
 
     fun rows(): List<EntryRowView> = rows
 
-    private fun appendRow(entry: EntryDraft, slot: Int): EntryRowView {
+    /** Inserts a new entry right after [row], carrying the text typed after the newline. */
+    fun addEntryAfter(row: EntryRowView, remainder: String): EntryRowView? {
+        val index = rows.indexOf(row)
+        if (index < 0) return null
+        val entry = EntryDraft(type = row.draft.type, text = remainder)
+        draft.entries.add(index + 1, entry)
+        val created = createRow(entry, index + 1)
+        binding.blockEntries.addView(
+            created,
+            index + 1,
+            LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT
+            )
+        )
+        rows.add(index + 1, created)
+        renumber()
+        created.focusText()
+        created.post {
+            (parent as? android.view.View)?.requestRectangleOnScreen(
+                android.graphics.Rect(0, 0, created.width, created.height)
+            )
+        }
+        callback?.onContentChanged()
+        return created
+    }
+
+    private fun createRow(entry: EntryDraft, slot: Int): EntryRowView {
         val row = EntryRowView(context)
         row.bind(entry, slot)
         row.onFocus = { callback?.onEntryFocused(it) }
-        row.onBlur = { callback?.onEntryBlur(it) }
+        row.onEnter = { source, remainder -> callback?.onEntryEnter(source, remainder) }
         row.onDeadlineClick = { callback?.onEntryDeadline(it) }
         row.onDeadlineLongClick = { callback?.onEntryDeadlineLong(it) }
         row.onContentChanged = { callback?.onContentChanged() }
+        return row
+    }
+
+    private fun appendRow(entry: EntryDraft, slot: Int): EntryRowView {
+        val row = createRow(entry, slot)
         binding.blockEntries.addView(
             row,
             LinearLayout.LayoutParams(

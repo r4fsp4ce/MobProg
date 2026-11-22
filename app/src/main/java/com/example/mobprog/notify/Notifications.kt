@@ -7,6 +7,8 @@ import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.media.AudioAttributes
+import android.media.RingtoneManager
 import android.os.Build
 import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat
@@ -16,6 +18,7 @@ import com.example.mobprog.R
 object Notifications {
 
     const val CHANNEL_DEADLINES = "deadlines"
+    const val CHANNEL_DEADLINE_ALARM = "deadline_alarm"
     const val CHANNEL_SERVICE = "quick_note"
 
     private const val SERVICE_NOTIFICATION_ID = 1001
@@ -30,6 +33,27 @@ object Notifications {
         ).apply {
             description = context.getString(R.string.notification_channel_deadlines_description)
         }
+        // The at-deadline alert has to be heard: alarm stream, alarm ringtone,
+        // vibration. The early reminders keep the ordinary notification sound.
+        val alarmSound = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM)
+            ?: RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION)
+        val deadlineAlarm = NotificationChannel(
+            CHANNEL_DEADLINE_ALARM,
+            context.getString(R.string.notification_channel_deadline_alarm),
+            NotificationManager.IMPORTANCE_HIGH
+        ).apply {
+            description =
+                context.getString(R.string.notification_channel_deadline_alarm_description)
+            setSound(
+                alarmSound,
+                AudioAttributes.Builder()
+                    .setUsage(AudioAttributes.USAGE_ALARM)
+                    .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
+                    .build()
+            )
+            enableVibration(true)
+            vibrationPattern = longArrayOf(0, 500, 400, 500)
+        }
         val service = NotificationChannel(
             CHANNEL_SERVICE,
             context.getString(R.string.notification_channel_quick_note),
@@ -38,7 +62,7 @@ object Notifications {
             description = context.getString(R.string.notification_channel_quick_note_description)
             setShowBadge(false)
         }
-        manager.createNotificationChannels(listOf(deadlines, service))
+        manager.createNotificationChannels(listOf(deadlines, deadlineAlarm, service))
     }
 
     fun canPost(context: Context): Boolean {
@@ -60,7 +84,8 @@ object Notifications {
         ensureChannels(context)
 
         val title = noteTitle.ifBlank { context.getString(R.string.app_name) }
-        val headline = if (offsetMinutes <= 0) {
+        val atDeadline = offsetMinutes <= 0
+        val headline = if (atDeadline) {
             context.getString(R.string.notification_deadline_due)
         } else if (offsetMinutes < 60) {
             context.getString(R.string.countdown_minutes, offsetMinutes)
@@ -69,16 +94,21 @@ object Notifications {
         }
         val body = entryText.ifBlank { context.getString(R.string.notification_body_fallback) }
 
-        val notification = NotificationCompat.Builder(context, CHANNEL_DEADLINES)
+        val builder = NotificationCompat.Builder(
+            context,
+            if (atDeadline) CHANNEL_DEADLINE_ALARM else CHANNEL_DEADLINES
+        )
             .setSmallIcon(R.drawable.ic_logo)
             .setContentTitle(title)
             .setContentText(body)
             .setStyle(NotificationCompat.BigTextStyle().bigText("$headline\n$body"))
             .setAutoCancel(true)
             .setContentIntent(openNote(context, noteId, deadLineRequestCode(noteId)))
-            .build()
+        if (atDeadline) {
+            builder.setCategory(NotificationCompat.CATEGORY_ALARM)
+        }
 
-        managerOf(context)?.notify(DEADLINE_NOTIFICATION_ID + (noteId and 0xFFFF).toInt(), notification)
+        managerOf(context)?.notify(DEADLINE_NOTIFICATION_ID + (noteId and 0xFFFF).toInt(), builder.build())
     }
 
     fun serviceNotification(context: Context): android.app.Notification {

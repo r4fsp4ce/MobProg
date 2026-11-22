@@ -62,7 +62,7 @@ class ChatHeadService : Service() {
     private fun addChatHead() {
         val size = dp(56)
         val head = ImageView(this).apply {
-            setImageResource(R.drawable.bg_chat_head)
+            setImageResource(R.drawable.tudow_bubble)
             contentDescription = getString(R.string.cd_quick_note)
             setOnTouchListener(DragListener(onTap = { togglePanel() }))
         }

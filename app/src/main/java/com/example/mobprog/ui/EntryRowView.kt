@@ -6,6 +6,7 @@ import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.widget.LinearLayout
 import androidx.core.view.isVisible
+import androidx.core.widget.doAfterTextChanged
 import com.example.mobprog.R
 import com.example.mobprog.databinding.ViewEntryRowBinding
 import com.example.mobprog.model.EntryDraft
@@ -26,13 +27,14 @@ class EntryRowView @JvmOverloads constructor(
         private set
 
     var onFocus: ((EntryRowView) -> Unit)? = null
-    var onBlur: ((EntryRowView) -> Unit)? = null
+    var onEnter: ((EntryRowView, String) -> Unit)? = null
     var onDeadlineClick: ((EntryRowView) -> Unit)? = null
     var onDeadlineLongClick: ((EntryRowView) -> Unit)? = null
     var onContentChanged: (() -> Unit)? = null
 
     private var slot = 0
     private var bindingValues = false
+    private var splitting = false
 
     init {
         orientation = HORIZONTAL
@@ -45,7 +47,27 @@ class EntryRowView @JvmOverloads constructor(
             }
         }
         binding.entryText.setOnFocusChangeListener { _, hasFocus ->
-            if (hasFocus) onFocus?.invoke(this) else onBlur?.invoke(this)
+            if (hasFocus) onFocus?.invoke(this)
+        }
+        // A newline means "start the next item": the tail moves into a new row.
+        binding.entryText.doAfterTextChanged { editable ->
+            if (bindingValues || splitting) return@doAfterTextChanged
+            val value = editable?.toString().orEmpty()
+            draft.text = value
+            val newline = value.indexOf('\n')
+            if (newline < 0) {
+                // Plain typing must reach the editor, or undo stays disabled.
+                onContentChanged?.invoke()
+                return@doAfterTextChanged
+            }
+            val before = value.substring(0, newline)
+            val after = value.substring(newline + 1)
+            splitting = true
+            binding.entryText.setText(before)
+            binding.entryText.setSelection(before.length)
+            splitting = false
+            draft.text = before
+            onEnter?.invoke(this, after)
         }
         binding.entryDeadline.setOnClickListener { onDeadlineClick?.invoke(this) }
         binding.entryDeadline.setOnLongClickListener {
@@ -70,7 +92,8 @@ class EntryRowView @JvmOverloads constructor(
     fun collect(): EntryDraft {
         draft.text = binding.entryText.text?.toString().orEmpty()
         draft.checked = binding.entryCheckbox.isChecked
-        return draft
+        // Undo/redo keeps snapshots of this; they must not share the live object.
+        return draft.copyDraft()
     }
 
     fun setType(type: EntryType) {
@@ -94,12 +117,14 @@ class EntryRowView @JvmOverloads constructor(
             binding.entryPriority.contentDescription =
                 context.getString(R.string.priority_label, context.getString(priority.labelRes))
         }
+        updateMeta()
     }
 
     fun applyDeadline() {
         val deadline = draft.deadlineAt
         if (deadline == null) {
             binding.entryDeadline.isVisible = false
+            updateMeta()
             return
         }
         val label = Dates.deadlineLabel(context, deadline, draft.allDay)
@@ -111,6 +136,13 @@ class EntryRowView @JvmOverloads constructor(
         binding.entryDeadline.setTextColor(
             context.getColor(if (overdue) R.color.deadline_overdue else R.color.deadline_normal)
         )
+        updateMeta()
+    }
+
+    /** The badge line only exists while there is something to show in it. */
+    private fun updateMeta() {
+        binding.entryMeta.isVisible =
+            draft.priority != Priority.NONE || draft.deadlineAt != null
     }
 
     fun focusText() {
